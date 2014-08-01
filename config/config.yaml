@@ -1,0 +1,39 @@
+# handlers will be executer sequentially up to the point when some returns response
+# so make sure that last one will return it
+
+pipelines:
+  main:
+    handlers:
+      - handler: ianua.handlers.throttling.ThrottlingHandler
+        limit: 10
+        per: 1
+        burst: 5
+
+      - handler: ianua.handlers.soap.SoapHandler
+        xsd: config/nomis.xml
+
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://127.0.0.1/api
+
+  simple:
+    handlers:
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://127.0.0.1/api
+
+  test:
+    methods:
+      - get
+      - post
+
+    handlers:
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://google.com/
+
+
+routes:
+  /ws:
+    pipeline: test
+
+
+#flask options
+DEBUG: True

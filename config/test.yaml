@@ -1,0 +1,64 @@
+# handlers will be executer sequentially up to the point when some returns response
+# so make sure that last one will return it
+
+pipelines:
+  main:
+    handlers:
+      - handler: ianua.handlers.throttling.ThrottlingHandler
+        limit: 10
+        per: 1
+        burst: 5
+
+      - handler: ianua.handlers.soap.SoapHandler
+        wsdl: config/wsdl.xml
+        xsd: config/nomis.xsd
+
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://127.0.0.1/api
+
+  test:
+    handlers:
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://127.0.0.1:4000/ws
+
+  test_slash:
+    handlers:
+      - handler: ianua.handlers.request.RequestHandler
+        url: http://127.0.0.1:4000/ws/
+
+  test_mock:
+    methods:
+      - get
+      - post
+
+    handlers:
+      - handler: ianua.handlers.request.RequestHandlerMock
+        url: http://google.com/ws
+
+  test_soap:
+    methods:
+      - post
+
+    handlers:
+      - handler: ianua.handlers.soap.SoapHandler
+        xsd: config/nomis.xsd
+
+      - handler: ianua.handlers.request.RequestHandlerMock
+        url: http://google.com/ws
+
+
+routes:
+  /test:
+    pipeline: test
+
+  /slash/:
+    pipeline: test_slash
+
+  /mock:
+    pipeline: test_mock
+
+  /soap:
+    pipeline: test_soap
+
+#flask options
+DEBUG: True
