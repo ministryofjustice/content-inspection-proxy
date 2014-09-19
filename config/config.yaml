@@ -1,24 +1,24 @@
-# handlers will be executer sequentially up to the point when some returns response
-# so make sure that last one will return it
+# handlers will be executer sequentially up to the point when some returns
+# response so make sure that last one will return it
 
 pipelines:
   main:
     handlers:
-      - handler: ianua.handlers.throttling.ThrottlingHandler
+      - handler: cip.handlers.throttling.ThrottlingHandler
         limit: 10
         per: 1
         burst: 5
 
-      - handler: ianua.handlers.soap.SoapHandler
+      - handler: cip.handlers.soap.SoapHandler
         xsd: config/nomis.xml
 
-      - handler: ianua.handlers.request.RequestHandler
-        url: http://127.0.0.1/api
+      - handler: cip.handlers.request.RequestHandler
+        url: http://127.0.0.1:12345/api
 
   simple:
     handlers:
-      - handler: ianua.handlers.request.RequestHandler
-        url: http://127.0.0.1/api
+      - handler: cip.handlers.request.RequestHandler
+        url: http://127.0.0.1:12345/api
 
   test:
     methods:
@@ -26,13 +26,22 @@ pipelines:
       - post
 
     handlers:
-      - handler: ianua.handlers.request.RequestHandler
+      - handler: cip.handlers.request.RequestHandler
         url: http://google.com/
 
 
 routes:
   /ws:
     pipeline: test
+  /main:
+    pipeline: main
+
+environment: staging
+
+xml_config:
+  custom_def: config/moj.xsd
+  transformations:
+     xs:string: moj:LimitedString
 
 
 #flask options

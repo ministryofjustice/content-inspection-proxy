@@ -1,29 +1,33 @@
-# handlers will be executer sequentially up to the point when some returns response
+# handlers will be executed sequentially up to the point when some returns response
 # so make sure that last one will return it
 
 pipelines:
   main:
     handlers:
-      - handler: ianua.handlers.throttling.ThrottlingHandler
+      - handler: cip.handlers.throttling.ThrottlingHandler
         limit: 10
         per: 1
         burst: 5
 
-      - handler: ianua.handlers.soap.SoapHandler
+      - handler: cip.handlers.soap.SoapHandlerMock
         wsdl: config/wsdl.xml
         xsd: config/nomis.xsd
+        xml_config:
+          custom_def: config/moj.xsd
+          transformations:
+             xs:string: moj:LimitedString
 
-      - handler: ianua.handlers.request.RequestHandler
+      - handler: cip.handlers.request.RequestHandlerMock
         url: http://127.0.0.1/api
 
   test:
     handlers:
-      - handler: ianua.handlers.request.RequestHandler
+      - handler: cip.handlers.request.RequestHandlerMock
         url: http://127.0.0.1:4000/ws
 
   test_slash:
     handlers:
-      - handler: ianua.handlers.request.RequestHandler
+      - handler: cip.handlers.request.RequestHandlerMock
         url: http://127.0.0.1:4000/ws/
 
   test_mock:
@@ -32,20 +36,46 @@ pipelines:
       - post
 
     handlers:
-      - handler: ianua.handlers.request.RequestHandlerMock
-        url: http://google.com/ws
+      - handler: cip.handlers.request.RequestHandlerMock
+        url: http://127.0.0.1:4000/ws
 
   test_soap:
     methods:
       - post
 
     handlers:
-      - handler: ianua.handlers.soap.SoapHandler
+      - handler: cip.handlers.soap.SoapHandlerMock
+        xsd: config/nomis.xsd
+        request_size: 4096
+
+  test_small_soap:
+    methods:
+      - post
+
+    handlers:
+      - handler: cip.handlers.soap.SoapHandlerMock
+        request_size: 5
         xsd: config/nomis.xsd
 
-      - handler: ianua.handlers.request.RequestHandlerMock
+
+      - handler: cip.handlers.request.RequestHandlerMock
         url: http://google.com/ws
 
+
+  test_enhanced_soap:
+    methods:
+      - post
+
+    handlers:
+      - handler: cip.handlers.soap.SoapHandlerMock
+        xsd: config/nomis.xsd
+        xml_config:
+          custom_def: config/moj.xsd
+          transformations:
+             xs:string: moj:LimitedString
+
+      - handler: cip.handlers.request.RequestHandlerMock
+        url: http://google.com/ws
 
 routes:
   /test:
@@ -60,5 +90,14 @@ routes:
   /soap:
     pipeline: test_soap
 
+  /more_soap:
+    pipeline: test_enhanced_soap
+
+  /little_soap:
+    pipeline: test_small_soap
+
+environment: staging
 #flask options
 DEBUG: True
+
+

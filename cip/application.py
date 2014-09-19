@@ -1,7 +1,7 @@
 from flask import Flask
 
-from ianua.config import open_config
-from ianua.pipeline import Pipeline
+from cip.config import open_config
+from cip.pipeline import Pipeline
 
 
 def blank_view():
@@ -23,8 +23,11 @@ def setup_routes(app):
     index = 0
     for route, route_config in app.config.get('routes').iteritems():
         #TODO: get view function as callable object or class
-        #I guess we should initialize the object on start and we can make it a singleton
-        #flask view classes - are they singletons? or should we have an independent storage
+        # I guess we should initialize the object on start and we can make
+        # it a singleton
+        #
+        # flask view classes - are they singletons? or should we have an
+        # independent storage
         pipeline_name = route_config.get('pipeline', 'default')
         route_specs = []
 
@@ -37,7 +40,8 @@ def setup_routes(app):
             route_specs.append("{}/<path:path>".format(route))
 
         for route_spec in route_specs:
-            app.add_url_rule(route_spec, "view{}".format(index), pipelines[pipeline_name],
+            app.add_url_rule(route_spec, "view{}".format(index),
+                             pipelines[pipeline_name],
                              strict_slashes=False,
                              methods=pipelines[pipeline_name].methods)
 
@@ -51,8 +55,9 @@ def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
 
     app.debug_log_format = (
-        '%(levelname)s in %(module)s [%(pathname)s:%(lineno)d]:\n' +
-        '%(message)s\n'
+        '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +
+          '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +
+        '"payload": %(message)s}'
     )
 
     open_config(app, config_file=config_file)
