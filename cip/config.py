@@ -2,6 +2,7 @@
 There is no value from having flask configuration separated from ianua configuration.
 So let's have them both as a json file.
 """
+import json
 
 import yaml
 from collections import OrderedDict
@@ -32,4 +33,4 @@ def open_config(app, config_file):
     with app.open_resource(config_file) as f:
         config = yaml.load(f.read(), UpperKeyLoader)  # we are using our loader as flask checks for keys in uppercase
     app.config.from_object(type('', (object,), config))
-    app.logger.info("Opened config:{}".format(config_file))
+    app.logger.info(json.dumps("Opened config:{}".format(config_file)))

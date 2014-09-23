@@ -2,5 +2,3 @@ requests
 lxml
 PyYAML
 flask
-subprocess32
-M2Crypto

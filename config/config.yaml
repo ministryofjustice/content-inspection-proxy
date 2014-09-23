@@ -3,45 +3,33 @@
 
 pipelines:
   main:
-    handlers:
-      - handler: cip.handlers.throttling.ThrottlingHandler
-        limit: 10
-        per: 1
-        burst: 5
-
-      - handler: cip.handlers.soap.SoapHandler
-        xsd: config/nomis.xml
-
-      - handler: cip.handlers.request.RequestHandler
-        url: http://127.0.0.1:12345/api
-
-  simple:
-    handlers:
-      - handler: cip.handlers.request.RequestHandler
-        url: http://127.0.0.1:12345/api
-
-  test:
     methods:
-      - get
+      - post
+
+    handlers:
+      - handler: cip.handlers.soap.SoapHandler
+        xsd: config/xsd.xml
+        soap_xsd: config/soap.xsd
+
+      - handler: cip.handlers.request.RequestHandler
+        url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
+
+  direct:
+    methods:
       - post
 
     handlers:
       - handler: cip.handlers.request.RequestHandler
-        url: http://google.com/
+        url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
 
 routes:
   /ws:
-    pipeline: test
+    pipeline: direct
   /main:
     pipeline: main
 
 environment: staging
-
-xml_config:
-  custom_def: config/moj.xsd
-  transformations:
-     xs:string: moj:LimitedString
 
 
 #flask options

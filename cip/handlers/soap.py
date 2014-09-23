@@ -19,7 +19,8 @@ class SoapHandler(BaseHandler):
         super(SoapHandler, self).__init__(**kwargs)
 
         self.root_dir = os.path.dirname(cip.__file__)
-        soap_xsd_path = os.path.join(self.root_dir, '..', 'config/soap.xsd')
+        soap_xsd_path = os.path.join(self.root_dir, '..',
+                                     self.config['soap_xsd'])
         self.xsd_path = os.path.join(self.root_dir, '..', self.config['xsd'])
         custom_xsd = os.path.join(self.root_dir, '..', 'config',
                                   'nomis_test1.xsd')

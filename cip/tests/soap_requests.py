@@ -1,13 +1,49 @@
 
 soap_checkPrisonerInfo = """\
 <?xml version="1.0" encoding="UTF-8"?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://prisonvisits.service.gov.uk/booking" xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
-<env:Body>
-    <tns:checkPrisonerInfo><prisonerInfo><forename>Lynn</forename><surname>Able</surname><number>b2793za</number><prisonId>RCI</prisonId><dateOfBirth>1977-06-15</dateOfBirth></prisonerInfo></tns:checkPrisonerInfo></env:Body></env:Envelope>
+<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tns="http://services.pvb.nomis.syscon.net/"
+        xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+    <env:Body>
+        <tns:checkPrisonerInfo>
+            <prisonerInfo>
+                <forename>Lynn</forename>
+                <surname>Able</surname>
+                <dateOfBirth>1977-06-15T00:00:00</dateOfBirth>
+                <number>b2793za</number>
+                <prisonId>RCI</prisonId>
+            </prisonerInfo>
+        </tns:checkPrisonerInfo>
+    </env:Body>
+</env:Envelope>
 """
 
 soap_getAvailableTimeSlots1 = """\
-<?xml version="1.0" encoding="UTF-8"?><env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://prisonvisits.service.gov.uk/booking" xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"><env:Body><tns:getAvailableTimeSlots><prisonerInfo><forename>Lynn</forename><surname>Able</surname><number>b2793za</number><prisonId>RCI</prisonId><dateOfBirth>1977-06-15</dateOfBirth></prisonerInfo><visitors><forename>Kimberli</forename><surname>Sevier</surname><dateOfBirth>1992-05-27</dateOfBirth></visitors><startDate>2014-07-21</startDate><endDate>2014-08-14</endDate></tns:getAvailableTimeSlots></env:Body></env:Envelope>
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tns="http://services.pvb.nomis.syscon.net/"
+        xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+    <env:Body>
+        <tns:getAvailableTimeSlots>
+            <prisonerInfo>
+                <forename>Lynn</forename>
+                <surname>Able</surname>
+                <dateOfBirth>1977-06-15T00:00:00</dateOfBirth>
+                <number>b2793za</number>
+                <prisonId>RCI</prisonId>
+            </prisonerInfo>
+            <visitors>
+                <dateOfBirth>1992-05-27T00:00:00</dateOfBirth>
+                <forename>Kimberli</forename>
+                <surname>Sevier</surname>
+            </visitors>
+            <startDate>2014-10-21T00:00:00</startDate>
+            <endDate>2014-10-21T01:00:00</endDate>
+        </tns:getAvailableTimeSlots>
+    </env:Body>
+</env:Envelope>
 """
 
 soap_getAvailableTimeSlots2 = """\

@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 
 from cip.config import open_config
@@ -45,7 +46,7 @@ def setup_routes(app):
                              strict_slashes=False,
                              methods=pipelines[pipeline_name].methods)
 
-        app.logger.debug("Added route: {}".format(route))
+        app.logger.debug(json.dumps("Added route: {}".format(route)))
         index += 1
 
     return app

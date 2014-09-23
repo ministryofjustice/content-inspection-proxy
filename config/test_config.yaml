@@ -1,0 +1,18 @@
+base_url: http://127.0.0.1:5000
+
+test_targets:
+  - name: check prisoner info
+    method: post
+    url: /main
+    headers:
+      Content-Type: text/xml
+    data: check_prisoner_info
+    success: 200
+
+  - name: get available timeslots
+    method: post
+    url: /main
+    headers:
+      Content-Type: text/xml
+    data: get_available_timeslots
+    success: 200
