@@ -60,6 +60,11 @@ def app_maker(config_file="../config/config.yaml"):
         '"payload": %(message)s}'
     )
 
+    # Place dummy handler
+    @app.route('/dummy', methods=['POST'])
+    def dummy():
+        return '<success>Bingo</success>'
+
     open_config(app, config_file=config_file)
     setup_routes(app)
     return app

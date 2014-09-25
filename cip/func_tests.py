@@ -1,10 +1,14 @@
 import os
 import traceback
+import sys
 import yaml
 import requests
 from tests import soap_requests
 
-with open('config/test_config.yaml') as cfg_file:
+cfg = 'config/test_config.yaml'\
+    if 'CIP_FT_CFG' not in os.environ else os.environ['CIP_FT_CFG']
+
+with open(cfg) as cfg_file:
     config = yaml.load(cfg_file.read())
 
 methods = {
@@ -68,3 +72,4 @@ for target in config['test_targets']:
 print 'Failed: {} out of {}'.format(fail, total)
 if fail:
     print 'Rerun with env variable DEBUG set in order to see diagnostic output'
+    sys.exit(1)

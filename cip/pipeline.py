@@ -65,11 +65,15 @@ class Pipeline(object):
                     'request_data': str(request.data)
                 }
                 self.log.error(json.dumps(msg))
+                if 'xml' in request.headers['Content-Type']:
+                    out = common.xml_error
+                else:
+                    out = '{}'
                 if env == 'production':
-                    return (req_uuid, 500, {})
+                    return (out.format(req_uuid), 500, {})
                 else:
                     #TODO: Check request content type and respond appropriately
-                    return (traceback.format_exc(), 500, {})
+                    return (out.format(traceback.format_exc()), 500, {})
             finally:
                 end_dt = time.time()
                 common.post_stat(handler.handler_name,
@@ -92,7 +96,8 @@ class Pipeline(object):
                         'status_code': str(status_code)
                     }
                     self.log.error(json.dumps(msg))
-                payload = req_uuid if env == 'production' else payload
+                    payload = out.format(req_uuid)\
+                        if env == 'production' else payload
                 resp = make_response(payload, status_code)
                 resp.headers = dict(headers)
                 return resp

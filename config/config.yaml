@@ -22,12 +22,25 @@ pipelines:
       - handler: cip.handlers.request.RequestHandler
         url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
+  dummy:
+    methods:
+      - post
+
+    handlers:
+      - handler: cip.handlers.soap.SoapHandler
+        xsd: config/xsd.xml
+        soap_xsd: config/soap.xsd
+
+      - handler: cip.handlers.request.RequestHandler
+        url: http://localhost:5000/dummy
 
 routes:
   /ws:
     pipeline: direct
   /main:
     pipeline: main
+  /dummy:
+    pipeline: dummy
 
 environment: staging
 

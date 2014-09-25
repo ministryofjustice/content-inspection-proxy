@@ -1,4 +1,4 @@
-﻿FROM python:2.7
+FROM python:2.7
 ADD . /srv
 WORKDIR /srv/cip
 RUN pip install -r /srv/requirements.txt
