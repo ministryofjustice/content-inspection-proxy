@@ -2,3 +2,5 @@ requests
 lxml
 PyYAML
 flask
+gunicorn
+gevent

@@ -54,7 +54,6 @@ def setup_routes(app):
 
 def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
-
     app.debug_log_format = (
         '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +
           '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +

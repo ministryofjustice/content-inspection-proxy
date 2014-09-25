@@ -1,4 +1,5 @@
 import importlib
+import os
 
 
 class HandlerNotImplementedException(NotImplementedError):
@@ -20,7 +21,10 @@ class BaseHandler(object):
         return method_func(request, path)
 
     def url(self, path=None):
-        baseurl = self.config['url']
+        if 'CIP_REQ_URL' in os.environ:
+            baseurl = os.environ['CIP_REQ_URL']
+        else:
+            baseurl = self.config['url']
         if path:
             if baseurl.endswith('/'):
                 return "{}{}".format(baseurl, path)

@@ -8,11 +8,11 @@ soap_checkPrisonerInfo = """\
     <env:Body>
         <tns:checkPrisonerInfo>
             <prisonerInfo>
-                <forename>Lynn</forename>
-                <surname>Able</surname>
-                <dateOfBirth>1977-06-15T00:00:00</dateOfBirth>
-                <number>b2793za</number>
-                <prisonId>RCI</prisonId>
+                <forename>Jilly</forename>
+                <surname>Hall</surname>
+                <dateOfBirth>1970-01-01T00:00:00</dateOfBirth>
+                <number>a1401ae</number>
+                <prisonId>LEI</prisonId>
             </prisonerInfo>
         </tns:checkPrisonerInfo>
     </env:Body>
@@ -28,16 +28,16 @@ soap_getAvailableTimeSlots1 = """\
     <env:Body>
         <tns:getAvailableTimeSlots>
             <prisonerInfo>
-                <forename>Lynn</forename>
-                <surname>Able</surname>
-                <dateOfBirth>1977-06-15T00:00:00</dateOfBirth>
-                <number>b2793za</number>
-                <prisonId>RCI</prisonId>
+                <forename>Jilly</forename>
+                <surname>Hall</surname>
+                <dateOfBirth>1970-01-01T00:00:00</dateOfBirth>
+                <number>a1401ae</number>
+                <prisonId>LEI</prisonId>
             </prisonerInfo>
             <visitors>
-                <dateOfBirth>1992-05-27T00:00:00</dateOfBirth>
-                <forename>Kimberli</forename>
-                <surname>Sevier</surname>
+                <dateOfBirth>1976-04-30T00:00:00</dateOfBirth>
+                <forename>Tinker</forename>
+                <surname>Bell</surname>
             </visitors>
             <startDate>2014-10-21T00:00:00</startDate>
             <endDate>2014-10-21T01:00:00</endDate>
