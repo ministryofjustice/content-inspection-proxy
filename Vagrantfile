@@ -53,5 +53,5 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: "echo -e \"[default]\\naccess_key=#{AWS_KEY}\\nsecret_key=#{AWS_SECRET}\\n\">~/.s3cfg"
   config.vm.provision "shell", inline: "s3cmd ls|grep -q pvb_docker || s3cmd mb s3://pvb_docker"
   config.vm.provision "shell", inline: "docker export cip > cip.tar"
-  config.vm.provision "shell", inline: "s3cmd put -q --multipart-chunk-size-mb=1024 cip.tar s3://pvb_docker"
+  config.vm.provision "shell", inline: "s3cmd -q put --multipart-chunk-size-mb=1024 cip.tar s3://pvb_docker"
 end
