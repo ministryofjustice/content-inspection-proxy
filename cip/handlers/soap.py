@@ -99,4 +99,4 @@ class SoapHandler(BaseHandler):
 class SoapHandlerMock(SoapHandler):
     def post(self, request, path=None):
         super(SoapHandlerMock, self).post(request, path)
-        return "requested:{}".format(path)
+        return ("requested:{}".format(path), 200, {})

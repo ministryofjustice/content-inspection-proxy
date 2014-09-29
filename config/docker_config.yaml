@@ -43,7 +43,7 @@ routes:
     pipeline: dummy
 
 environment: staging
-log_file: cip.log
+log_file: /cip/cip.log
 
 #flask options
 DEBUG: True

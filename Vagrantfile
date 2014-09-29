@@ -9,8 +9,9 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure("2") do |config|
   IMAGE_NAME = "cip"
+  IMAGE_FILE = ENV.has_key?('CIP_FILE') ? ENV['CIP_FILE'] : 'cip.tar'
   IMAGE_DIR = "/cip"
-  RUN_ARGS = "-p 5000:5000 -e CIP_REQ_URL=http://localhost:5000/dummy"
+  RUN_ARGS = "-p 5000:5000 -e CIP_CFG=/cip/config/docker_config.yaml"
   TEST_CMD = "CIP_FT_CFG=/cip/config/vagrant_config.yaml python /cip/cip/func_tests.py"
 
   AWS_KEY = ENV.has_key?('AWS_KEY') ? ENV['AWS_KEY'] : 'UNDEFINED'
@@ -20,6 +21,8 @@ Vagrant.configure("2") do |config|
   AWS_REGION = ENV.has_key?('AWS_REGION') ? ENV['AWS_REGION'] : 'eu-west-1'
   AWS_SG = ENV.has_key?('AWS_SG') ? ENV['AWS_SG'].split(',') : ["ssh"]
   SSH_KEY = ENV.has_key?('SSH_KEY') ? ENV['SSH_KEY'] : "#{ENV['HOME']}/.ssh/id_rsa"
+
+  config.vm.box = 'ubuntu/trusty64'
 
   config.vm.provider :aws do |aws, override|
     aws.access_key_id = AWS_KEY
@@ -32,7 +35,7 @@ Vagrant.configure("2") do |config|
     aws.instance_type = 't2.small'
     override.ssh.username = "ubuntu"
     override.ssh.private_key_path = SSH_KEY
-    config.vm.box = "aws"
+    override.vm.box = "aws"
   end
 
   config.vm.provider "virtualbox" do |v|
@@ -41,7 +44,6 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", inline: "echo 'DOCKEROPTS=\"--dns 172.22.2.2\"'>>/etc/default/docker"
   end
 
-  config.vm.box = 'ubuntu/trusty64'
   config.vm.synced_folder ".", IMAGE_DIR
   config.vm.provision "docker" do |d|
     d.build_image IMAGE_DIR, args: "-t #{IMAGE_NAME}"
@@ -53,5 +55,5 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: "echo -e \"[default]\\naccess_key=#{AWS_KEY}\\nsecret_key=#{AWS_SECRET}\\n\">~/.s3cfg"
   config.vm.provision "shell", inline: "s3cmd ls|grep -q pvb_docker || s3cmd mb s3://pvb_docker"
   config.vm.provision "shell", inline: "docker export cip > cip.tar"
-  config.vm.provision "shell", inline: "s3cmd -q put --multipart-chunk-size-mb=1024 cip.tar s3://pvb_docker"
+  config.vm.provision "shell", inline: "s3cmd put --multipart-chunk-size-mb=1024 cip.tar s3://pvb_docker"
 end

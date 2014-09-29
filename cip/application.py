@@ -1,4 +1,8 @@
 import json
+from logging import FileHandler
+from logging import Formatter
+import os
+
 from flask import Flask
 
 from cip.config import open_config
@@ -48,23 +52,30 @@ def setup_routes(app):
 
         app.logger.debug(json.dumps("Added route: {}".format(route)))
         index += 1
-
+        # Place dummy handler
     return app
 
 
 def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
-    app.debug_log_format = (
-        '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +
-          '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +
-        '"payload": %(message)s}'
-    )
-
-    # Place dummy handler
     @app.route('/dummy', methods=['POST'])
     def dummy():
         return '<success>Bingo</success>'
 
     open_config(app, config_file=config_file)
+
+    if 'CIP_ENVIRONMENT' in os.environ:
+        app.config['environment'] = os.environ['CIP_ENVIRONMENT']
+
+    log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +\
+        '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +\
+        '"payload": %(message)s}'
+
+    app.debug_log_format = (log_fmt)
+
+    fh = FileHandler(app.config['log_file'])
+    fh.setFormatter(Formatter(log_fmt))
+    app.logger.addHandler(fh)
+
     setup_routes(app)
     return app

@@ -67,9 +67,9 @@ class RequestHandlerMock(RequestHandler):
     def get(self, request, path=None):
         url = self.url(path)
         self.log.debug(json.dumps("Mocking GET {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path)
+        return ("requested:{}".format(urlsplit(url).path), 200, {})
 
     def post(self, request, path=None):
         url = self.url(path)
         self.log.debug(json.dumps("Mocking POST {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path)
+        return ("requested:{}".format(urlsplit(url).path), 200, {})

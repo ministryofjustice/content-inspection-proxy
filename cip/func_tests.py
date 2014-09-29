@@ -10,7 +10,6 @@ cfg = 'config/test_config.yaml'\
 
 with open(cfg) as cfg_file:
     config = yaml.load(cfg_file.read())
-
 methods = {
     'get': requests.get,
     'post': requests.post,

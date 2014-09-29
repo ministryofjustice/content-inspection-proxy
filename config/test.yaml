@@ -12,6 +12,7 @@ pipelines:
       - handler: cip.handlers.soap.SoapHandlerMock
         wsdl: config/wsdl.xml
         xsd: config/nomis.xsd
+        soap_xsd: config/soap.xsd
         xml_config:
           custom_def: config/moj.xsd
           transformations:
@@ -46,6 +47,7 @@ pipelines:
     handlers:
       - handler: cip.handlers.soap.SoapHandlerMock
         xsd: config/nomis.xsd
+        soap_xsd: config/soap.xsd
         request_size: 4096
 
   test_small_soap:
@@ -56,6 +58,7 @@ pipelines:
       - handler: cip.handlers.soap.SoapHandlerMock
         request_size: 5
         xsd: config/nomis.xsd
+        soap_xsd: config/soap.xsd
 
 
       - handler: cip.handlers.request.RequestHandlerMock
@@ -69,6 +72,7 @@ pipelines:
     handlers:
       - handler: cip.handlers.soap.SoapHandlerMock
         xsd: config/nomis.xsd
+        soap_xsd: config/soap.xsd
         xml_config:
           custom_def: config/moj.xsd
           transformations:
@@ -100,4 +104,5 @@ environment: staging
 #flask options
 DEBUG: True
 
+log_file: ../cip.log
 
