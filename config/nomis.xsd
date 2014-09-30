@@ -1,106 +1,160 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<xs:schema xmlns:tns="http://services.pvb.nomis.syscon.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://services.pvb.nomis.syscon.net/">
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Oracle JAX-WS 2.1.5. --><xs:schema xmlns:tns="http://services.pvb.nomis.syscon.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://services.pvb.nomis.syscon.net/">
 
-    <xs:element name="PrisonVisitBookingOperationFault" nillable="true" type="tns:prisonVisitBookingOperationFaultBean"/>
+  <xs:annotation>
+     <xs:documentation>
 
-    <xs:element name="bookVisit" type="tns:bookVisit"/>
+      This is the XML schema for the Prison Visit Booking (PVB) web service. 
+      It is based on the JAX-B generated schema but with added restrictions.
 
-    <xs:element name="bookVisitResponse" type="tns:bookVisitResponse"/>
+     </xs:documentation>
+  </xs:annotation>
 
-    <xs:element name="cancelVisit" type="tns:cancelVisit"/>
+  <xs:element name="PrisonVisitBookingOperationFault" nillable="true" type="tns:prisonVisitBookingOperationFaultBean"/>
 
-    <xs:element name="cancelVisitResponse" type="tns:cancelVisitResponse"/>
+  <xs:element name="bookVisit" type="tns:bookVisit"/>
 
-    <xs:element name="checkPrisonerInfo" type="tns:checkPrisonerInfo"/>
+  <xs:element name="bookVisitResponse" type="tns:bookVisitResponse"/>
 
-    <xs:element name="checkPrisonerInfoResponse" type="tns:checkPrisonerInfoResponse"/>
+  <xs:element name="cancelVisit" type="tns:cancelVisit"/>
 
-    <xs:element name="getAvailableTimeSlots" type="tns:getAvailableTimeSlots"/>
+  <xs:element name="cancelVisitResponse" type="tns:cancelVisitResponse"/>
 
-    <xs:element name="getAvailableTimeSlotsResponse" type="tns:getAvailableTimeSlotsResponse"/>
+  <xs:element name="checkPrisonerInfo" type="tns:checkPrisonerInfo"/>
 
-    <xs:complexType name="cancelVisit">
-        <xs:sequence>
-            <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
-            <xs:element name="visitReference" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:element name="checkPrisonerInfoResponse" type="tns:checkPrisonerInfoResponse"/>
 
-    <xs:complexType name="prisonerInfo">
-        <xs:sequence>
-            <xs:element name="forename" type="xs:string" minOccurs="0"/>
-            <xs:element name="surname" type="xs:string" minOccurs="0"/>
-            <xs:element name="dateOfBirth" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="number" type="xs:string" minOccurs="0"/>
-            <xs:element name="prisonId" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:element name="getAvailableTimeSlots" type="tns:getAvailableTimeSlots"/>
 
-    <xs:complexType name="cancelVisitResponse">
-        <xs:sequence>
-            <xs:element name="return" type="xs:boolean"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:element name="getAvailableTimeSlotsResponse" type="tns:getAvailableTimeSlotsResponse"/>
 
-    <xs:complexType name="prisonVisitBookingOperationFaultBean">
-        <xs:sequence>
-            <xs:element name="message" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="cancelVisit">
+    <xs:sequence>
+      <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
+      <xs:element name="visitReference" type="tns:visitRefType" minOccurs="0"/>
 
-    <xs:complexType name="checkPrisonerInfo">
-        <xs:sequence>
-            <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="checkPrisonerInfoResponse">
-        <xs:sequence>
-            <xs:element name="return" type="xs:boolean"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="prisonerInfo">
+    <xs:sequence>
+      <xs:element name="forename" type="tns:nameType" minOccurs="0"/>
+      <xs:element name="surname" type="tns:nameType" minOccurs="0"/>
+      <xs:element name="dateOfBirth" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="number" type="tns:nomsNumberType" minOccurs="0"/>
+      <xs:element name="prisonId" type="tns:prisonIdType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="getAvailableTimeSlots">
-        <xs:sequence>
-            <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
-            <xs:element name="visitors" type="tns:visitor" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="cancelVisitResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="visitor">
-        <xs:sequence>
-            <xs:element name="dateOfBirth" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="forename" type="xs:string" minOccurs="0"/>
-            <xs:element name="surname" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="prisonVisitBookingOperationFaultBean">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="getAvailableTimeSlotsResponse">
-        <xs:sequence>
-            <xs:element name="return" type="tns:timeSlot" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="checkPrisonerInfo">
+    <xs:sequence>
+      <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="timeSlot">
-        <xs:sequence>
-            <xs:element name="startTime" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="endTime" type="xs:dateTime" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="checkPrisonerInfoResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="bookVisit">
-        <xs:sequence>
-            <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
-            <xs:element name="visitors" type="tns:visitor" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="timeSlot" type="tns:timeSlot" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="getAvailableTimeSlots">
+    <xs:sequence>
+      <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
+      <xs:element name="visitors" type="tns:visitor" minOccurs="0" maxOccurs="6"/>
+      <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="bookVisitResponse">
-        <xs:sequence>
-            <xs:element name="return" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="visitor">
+    <xs:sequence>
+      <xs:element name="dateOfBirth" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="forename" type="tns:nameType" minOccurs="0"/>
+      <xs:element name="surname" type="tns:nameType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableTimeSlotsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:timeSlot" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="timeSlot">
+    <xs:sequence>
+      <xs:element name="startTime" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="endTime" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="bookVisit">
+    <xs:sequence>
+      <xs:element name="prisonerInfo" type="tns:prisonerInfo" minOccurs="0"/>
+      <xs:element name="visitors" type="tns:visitor" minOccurs="0" maxOccurs="6"/>
+      <xs:element name="timeSlot" type="tns:timeSlot" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="bookVisitResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+ </xs:complexType>
+
+	<xs:annotation>
+		<xs:appinfo>pvbXmlSchemaTypeDefinitions.xml</xs:appinfo>
+		<xs:documentation>
+			XML fragment containing the xsd simpleType definitions to be added to the JAX-B
+			generated schema for field level validation. See individual type definitions for details of 
+			where they are to be used.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType name="nameType">
+	   <xs:annotation>
+	   <xs:documentation>To be used for elements forename and surname in complexTypes prisonerInfo and visitor.</xs:documentation>
+	   </xs:annotation>
+	   <xs:restriction base="xs:string"> 
+	      <xs:minLength value="1"/>
+	      <xs:maxLength value="30"/>
+	   </xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="nomsNumberType">
+	   <xs:annotation>
+	   <xs:documentation>To be used for element number in complexType prisonerInfo</xs:documentation>
+	   </xs:annotation>
+	   <xs:restriction base="xs:string">
+	      <xs:pattern value="[A-Za-z][0-9]{4}[A-Za-z]{2}"/>
+	   </xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="prisonIdType">
+	   <xs:annotation>
+	   <xs:documentation>To be used for element prisonId in complexType prisonerInfo</xs:documentation>
+	   </xs:annotation>	
+	   <xs:restriction base="xs:string">
+	      <xs:pattern value="[A-Za-z]{3}"/>
+	   </xs:restriction>
+	</xs:simpleType>   
+	
+	<xs:simpleType name="visitRefType">
+	   <xs:annotation>
+	   <xs:documentation>To be used for element visitReference in complexType cancelVisit</xs:documentation>
+	   </xs:annotation>	
+	   <xs:restriction base="xs:string">
+	      <xs:pattern value="VISID([0-9])+"/>
+	   </xs:restriction>
+	</xs:simpleType>   
 </xs:schema>

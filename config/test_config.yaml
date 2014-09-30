@@ -16,3 +16,13 @@ test_targets:
       Content-Type: text/xml
     data: get_available_timeslots
     success: 200
+
+  - name: test wsdl
+    method: get
+    url: /main?wsdl
+    success: 200
+
+  - name: test xsd
+    method: get
+    url: /main?xsd=1
+    success: 200

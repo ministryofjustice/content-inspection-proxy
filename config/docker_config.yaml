@@ -8,7 +8,7 @@ pipelines:
 
     handlers:
       - handler: cip.handlers.soap.SoapHandler
-        xsd: config/xsd.xml
+        xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
 
       - handler: cip.handlers.request.RequestHandler
@@ -28,7 +28,7 @@ pipelines:
 
     handlers:
       - handler: cip.handlers.soap.SoapHandler
-        xsd: config/xsd.xml
+        xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
 
       - handler: cip.handlers.request.RequestHandler

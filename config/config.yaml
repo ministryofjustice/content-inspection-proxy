@@ -5,11 +5,14 @@ pipelines:
   main:
     methods:
       - post
+      - get
 
     handlers:
       - handler: cip.handlers.soap.SoapHandler
-        xsd: config/xsd.xml
+        xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
+        wsdl: config/wsdl.xml
+        service_url: http://172.22.16.3:5000/main
 
       - handler: cip.handlers.request.RequestHandler
         url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
@@ -28,7 +31,7 @@ pipelines:
 
     handlers:
       - handler: cip.handlers.soap.SoapHandler
-        xsd: config/xsd.xml
+        xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
 
       - handler: cip.handlers.request.RequestHandler

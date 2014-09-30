@@ -38,10 +38,7 @@ for target in config['test_targets']:
         try:
             data = soap_req_map[target['data']]
         except KeyError:
-            print 'Request {} not found for test {}.'.format(
-                target['data'], target['method'])
-            fail += 1
-            continue
+            data = ""
 
         try:
             fn = methods[target['method']]
@@ -68,7 +65,8 @@ for target in config['test_targets']:
         if DEBUG:
             print traceback.format_exc()
 
-print 'Failed: {} out of {}'.format(fail, total)
+print '\n\nFailed: {} out of {}'.format(fail, total)
 if fail:
-    print 'Rerun with env variable DEBUG set in order to see diagnostic output'
+    if not DEBUG:
+        print 'Rerun with env variable DEBUG set in order to see diagnostic output'
     sys.exit(1)

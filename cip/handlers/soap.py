@@ -73,17 +73,26 @@ class SoapHandler(BaseHandler):
             xml_out.write(etree.tostring(new_root, pretty_print=True,
                                          xml_declaration=True))
 
-    def __call__(self, request, path=None):
-        """
-        enforces post method
-        :param request:
-        :param path:
-        :return: None
-        """
-        if request.method.lower() != 'post':
+    # def __call__(self, request, path=None):
+    #     """
+    #     enforces post method
+    #     :param request:
+    #     :param path:
+    #     :return: None
+    #     """
+    #     if request.method.lower() != 'post':
+    #         raise SoapValidationException(
+    #             "method ({}) is not allowed".format(request.method.lower()))
+    #     return self.post(request, path)
+
+    def base_method(self, request, path=None, method=None):
+        methods = {'get': self.get,
+                   'post': self.post}
+        method = methods.get(method, path)
+        if not method:
             raise SoapValidationException(
                 "method ({}) is not allowed".format(request.method.lower()))
-        return self.post(request, path)
+        return method(request, path=path)
 
     def post(self, request, path=None):
         request_size = self.config.get('request_size', 8192)
@@ -94,6 +103,41 @@ class SoapHandler(BaseHandler):
         parser = etree.XMLParser(resolve_entities=False, no_network=True)
         soap_request = etree.fromstring(request.data, parser=parser)
         self.schema.assertValid(soap_request)
+
+    def handle_wsdl_request(self):
+        wsdl_path = os.path.join(self.root_dir, '..', self.config['wsdl'])
+        x = etree.parse(wsdl_path)
+        r = x.getroot()
+
+        # TODO: Fix this mess.
+
+        # hack #1: Set the schema location
+        try:
+            filter(lambda x:x.tag == '{http://schemas.xmlsoap.org/wsdl/}types',
+                   r.getchildren())[0].getchildren()[0].getchildren()[0].set(
+                'schemaLocation', '{}?xsd=1'.format(self.config['service_url']))
+        except:
+            self.log.debug('Failed to set xsd location in wsdl')
+
+        # hack #2: Set the service location
+        try:
+            filter(lambda x:x.tag=='{http://schemas.xmlsoap.org/wsdl/}service',
+                   r.getchildren())[0].getchildren()[0].getchildren()[0].set(
+                'location', self.config['service_url'])
+        except:
+            self.log.debug('Failed to set service url')
+        return (etree.tostring(r, pretty_print=True, xml_declaration=True),
+                200, {'Content-Type': 'application/xml'})
+
+    def get(self, request, path=None):
+        if 'wsdl' in request.args:
+            return self.handle_wsdl_request()
+        elif 'xsd' in request.args:
+            with open(self.xsd_path) as xsd:
+                data = xsd.read()
+                return (data, 200, {'Content-Type': 'application/xml'})
+        else:
+            return(request.args, 404, {})
 
 
 class SoapHandlerMock(SoapHandler):
