@@ -46,7 +46,8 @@ class Pipeline(object):
         req_start_dt = time.time()
         # time.sleep(random.randint(0, 5))
         req_stat_name = 'request'
-        if 'xml' in request.headers['Content-Type']:
+        if 'Content-Type' in request.headers \
+                and 'xml' in request.headers['Content-Type']:
             out = common.xml_error
         else:
             out = '{}'
