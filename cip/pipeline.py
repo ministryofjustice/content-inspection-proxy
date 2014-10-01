@@ -1,4 +1,5 @@
 from logging import getLogger
+import random
 import uuid
 import traceback
 import json
@@ -10,6 +11,12 @@ from flask import current_app
 from cip.handler import get_handler
 from cip.handler import HandlerNotImplementedException
 from cip import common
+
+
+# default is microseconds
+def get_duration(req_start_dt, multiplier=1000000):
+    end_dt = time.time()
+    return int((end_dt - req_start_dt) * multiplier)
 
 
 class PipelineException(Exception):
@@ -37,9 +44,13 @@ class Pipeline(object):
     def __call__(self, path=None):
         req_uuid = request.headers.get('x-request_id', str(uuid.uuid4()))
         req_start_dt = time.time()
+        # time.sleep(random.randint(0, 5))
         req_stat_name = 'request'
+        if 'xml' in request.headers['Content-Type']:
+            out = common.xml_error
+        else:
+            out = '{}'
         for handler in self.handlers:
-            handler_start_dt = time.time()
             self.log.debug(json.dumps(
                 "[{}] Executing handler:{} with path:{}".format(
                     req_uuid, handler.__class__, path)))
@@ -49,14 +60,14 @@ class Pipeline(object):
                 # We return on the first handler that returns
                 response = handler(request, path=path)
             except HandlerNotImplementedException:
-                common.post_stat('unknown_handler', '+1', 'g')
-                common.post_stat('error', '+1', 'g')
+                common.post_stat('unknown_handler', '+1', 'c')
+                common.post_stat('error', '+1', 'c')
                 if env == 'production':
                     return (req_uuid, 404, {})
                 else:
                     return (traceback.format_exc(), 404, {})
             except Exception:
-                common.post_stat('error', '+1', 'g')
+                common.post_stat('error', '+1', 'c')
                 msg = {
                     'request_id': req_uuid,
                     'handler_class': handler.handler_name,
@@ -75,16 +86,13 @@ class Pipeline(object):
                     #TODO: Check request content type and respond appropriately
                     return (out.format(traceback.format_exc()), 500, {})
             finally:
-                end_dt = time.time()
-                common.post_stat(handler.handler_name,
-                                 end_dt - handler_start_dt, 'ms')
-                common.post_stat(req_stat_name,
-                                 end_dt - req_start_dt, 'ms')
+                common.post_stat(handler.handler_name, get_duration(req_start_dt),
+                                 'ms')
+                common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')
 
             if response:
-                common.post_stat('success', '+1', 'g')
-                common.post_stat(req_stat_name,
-                                 time.time() - req_start_dt, 'ms')
+                common.post_stat('success', '+1', 'c')
+                common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')
                 payload, status_code, headers = response
                 if status_code != 200:
                     msg = {
@@ -96,10 +104,11 @@ class Pipeline(object):
                         'status_code': str(status_code)
                     }
                     self.log.error(json.dumps(msg))
+
                     payload = out.format(req_uuid)\
                         if env == 'production' else payload
                 resp = make_response(payload, status_code)
                 resp.headers = dict(headers)
                 return resp
-        common.post_stat('no_response', '+1', 'g')
-        common.post_stat(req_stat_name, time.time() - req_start_dt, 'ms')
+        common.post_stat('no_response', '+1', 'c')
+        common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')

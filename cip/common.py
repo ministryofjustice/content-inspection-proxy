@@ -1,4 +1,7 @@
-# import socket
+import socket
+
+from flask import current_app
+
 xml_error = '''
 <?xml version='1.0' encoding='UTF-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -14,11 +17,15 @@ xml_error = '''
 # TODO: make this configurable
 # Commented out for now since this functionality has been put on hold
 def post_stat(key, value, type):
-    # try:
-    #     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #     s.connect(('127.0.0.1', 8125))
-    #     s.send('{}:{}|{}\n'.format(key, value, type))
-    #     s.close()
-    # except Exception:
-    #     pass
-    pass
+    config = current_app.config
+    logger = current_app.logger
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((config['collectd_host'], int(config['collectd_port'])))
+        s.send('{}:{}|{}\n'.format(key, value, type))
+        s.close()
+    except Exception:
+        # metrics although serious are not worthy of dropping the request
+        # Just log it and set an alert on the fact that we somehow
+        # failed miserably.
+        logger.exception('Error while sending stats.')
