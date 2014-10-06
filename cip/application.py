@@ -64,8 +64,8 @@ def app_maker(config_file="../config/config.yaml"):
 
     open_config(app, config_file=config_file)
 
-    if 'CIP_ENVIRONMENT' in os.environ:
-        app.config['environment'] = os.environ['CIP_ENVIRONMENT']
+    if 'CIP_HIDE_ERRORS' in os.environ:
+        app.config['hide_errors'] = True
 
     log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +\
         '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +\

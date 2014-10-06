@@ -42,7 +42,7 @@ routes:
   /dummy:
     pipeline: dummy
 
-environment: staging
+hide_errors: false
 log_file: /cip/cip.log
 
 #flask options

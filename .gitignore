@@ -3,4 +3,4 @@
 *~
 *.iml
 myenv.sh
-**/cip.log
+cip/cip.log

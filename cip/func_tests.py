@@ -22,34 +22,36 @@ soap_req_map = {
     'book_visit': soap_requests.soap_bookVisit_fixed,
 }
 
+if 'CIP_FT_BASE_URL' in os.environ:
+    config['base_url'] = os.environ['CIP_FT_BASE_URL']
 total = len(config['test_targets'])
 fail = 0
 
 DEBUG = os.environ.get('DEBUG', False)
 
-for target in config['test_targets']:
+for fixture in config['fixtures']:
     try:
-        print 'Testing {}... '.format(target['name']),
-        url = '{}{}'.format(config['base_url'], target['url']) \
-            if target['url'][0] == '/' else target['url']
+        print 'Testing {}... '.format(fixture['name']),
+        url = '{}{}'.format(config['base_url'], fixture['url']) \
+            if fixture['url'][0] == '/' else fixture['url']
         headers = config.get('base_headers', {})
-        headers.update(target.get('headers', {}))
+        headers.update(fixture.get('headers', {}))
 
         try:
-            data = soap_req_map[target['data']]
+            data = soap_req_map[fixture['data']]
         except KeyError:
             data = ""
 
         try:
-            fn = methods[target['method']]
+            fn = methods[fixture['method']]
             x = fn(url, headers=headers, data=data)
         except KeyError:
             print 'Test {} uses unsupported method {}'.format(
-                target['name'], target['method'])
+                fixture['name'], fixture['method'])
             fail += 1
             continue
 
-        if x.status_code == target['success']:
+        if x.status_code == fixture['success']:
             print 'SUCCESS'
         else:
             print 'FAIL'

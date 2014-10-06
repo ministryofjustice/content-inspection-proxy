@@ -45,8 +45,11 @@ routes:
   /dummy:
     pipeline: dummy
 
-environment: staging
+hide_errors: false
 log_file: cip.log
 
 #flask options
 DEBUG: True
+
+collectd_host: 127.0.0.1
+collectd_port: 8125

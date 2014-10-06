@@ -61,10 +61,6 @@ pipelines:
         soap_xsd: config/soap.xsd
 
 
-      - handler: cip.handlers.request.RequestHandlerMock
-        url: http://google.com/ws
-
-
   test_enhanced_soap:
     methods:
       - post
@@ -100,9 +96,11 @@ routes:
   /little_soap:
     pipeline: test_small_soap
 
-environment: staging
+hide_errors: false
 #flask options
 DEBUG: True
 
 log_file: ../cip.log
 
+collectd_host: 172.16.195.129
+collectd_port: 8125

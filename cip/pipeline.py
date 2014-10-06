@@ -49,24 +49,27 @@ class Pipeline(object):
         if 'Content-Type' in request.headers \
                 and 'xml' in request.headers['Content-Type']:
             out = common.xml_error
+            resp_headers = {'Content-Type': 'application/xml'}
+
         else:
             out = '{}'
+            resp_headers = {}
+        hide_errors = current_app.config.get('hide_errors', True)
         for handler in self.handlers:
             self.log.debug(json.dumps(
                 "[{}] Executing handler:{} with path:{}".format(
                     req_uuid, handler.__class__, path)))
 
-            env = current_app.config.get('environment', 'production')
             try:
                 # We return on the first handler that returns
                 response = handler(request, path=path)
             except HandlerNotImplementedException:
                 common.post_stat('unknown_handler', '+1', 'c')
                 common.post_stat('error', '+1', 'c')
-                if env == 'production':
-                    return (req_uuid, 404, {})
+                if hide_errors:
+                    return out.format(req_uuid), 404, resp_headers
                 else:
-                    return (traceback.format_exc(), 404, {})
+                    return out.format(traceback.format_exc()), 404, resp_headers
             except Exception:
                 common.post_stat('error', '+1', 'c')
                 msg = {
@@ -77,25 +80,20 @@ class Pipeline(object):
                     'request_data': str(request.data)
                 }
                 self.log.error(json.dumps(msg))
-                if 'xml' in request.headers['Content-Type']:
-                    out = common.xml_error
+                if hide_errors:
+                    return out.format(req_uuid), 500, resp_headers
                 else:
-                    out = '{}'
-                if env == 'production':
-                    return (out.format(req_uuid), 500, {})
-                else:
-                    #TODO: Check request content type and respond appropriately
-                    return (out.format(traceback.format_exc()), 500, {})
+                    return out.format(traceback.format_exc()), 500, resp_headers
             finally:
-                common.post_stat(handler.handler_name, get_duration(req_start_dt),
-                                 'ms')
-                common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')
+                common.post_stat(handler.handler_name,
+                                 get_duration(req_start_dt), 'ms')
+                common.post_stat(req_stat_name,
+                                 get_duration(req_start_dt), 'ms')
 
             if response:
                 common.post_stat('success', '+1', 'c')
-                common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')
                 payload, status_code, headers = response
-                if status_code != 200:
+                if 300 > status_code < 200:
                     msg = {
                         'request_id': req_uuid,
                         'handler_name': handler.handler_name,
@@ -105,11 +103,20 @@ class Pipeline(object):
                         'status_code': str(status_code)
                     }
                     self.log.error(json.dumps(msg))
-
-                    payload = out.format(req_uuid)\
-                        if env == 'production' else payload
-                resp = make_response(payload, status_code)
-                resp.headers = dict(headers)
-                return resp
+                    payload = out.format(req_uuid) if hide_errors else payload
+                # resp = make_response(payload, status_code)
+                # resp.headers = dict(headers)
+                return payload, status_code, dict(headers)
         common.post_stat('no_response', '+1', 'c')
         common.post_stat(req_stat_name, get_duration(req_start_dt), 'ms')
+        msg = {
+            'request_id': req_uuid,
+            'message': 'No response from handlers',
+            'headers': str(request.headers),
+            'request_data': str(request.data)
+        }
+        self.log.error(json.dumps(msg))
+        if hide_errors:
+            return out.format(req_uuid), 500, resp_headers
+        else:
+            return out.format('No response from handlers'), 500, resp_headers

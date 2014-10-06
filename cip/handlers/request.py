@@ -60,16 +60,16 @@ class RequestHandler(BaseHandler):
         response = method_dict[self.req_method](url, request.data,
                                                 headers=headers)
         response.headers = self.sanitize_headers(response.headers)
-        return (response.text, response.status_code, response.headers.items())
+        return response.text, response.status_code, response.headers.items()
 
 
 class RequestHandlerMock(RequestHandler):
     def get(self, request, path=None):
         url = self.url(path)
         self.log.debug(json.dumps("Mocking GET {}".format(url)))
-        return ("requested:{}".format(urlsplit(url).path), 200, {})
+        return "requested:{}".format(urlsplit(url).path), 200, {}
 
     def post(self, request, path=None):
         url = self.url(path)
         self.log.debug(json.dumps("Mocking POST {}".format(url)))
-        return ("requested:{}".format(urlsplit(url).path), 200, {})
+        return "requested:{}".format(urlsplit(url).path), 200, {}
