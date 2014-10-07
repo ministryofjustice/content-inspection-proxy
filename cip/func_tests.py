@@ -24,7 +24,7 @@ soap_req_map = {
 
 if 'CIP_FT_BASE_URL' in os.environ:
     config['base_url'] = os.environ['CIP_FT_BASE_URL']
-total = len(config['test_targets'])
+total = len(config['fixtures'])
 fail = 0
 
 DEBUG = os.environ.get('DEBUG', False)
