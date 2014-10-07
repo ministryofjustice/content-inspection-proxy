@@ -54,7 +54,7 @@ class SoapHandler(BaseHandler):
 
     @lru_cache(maxsize=16)
     def handle_wsdl_request(self):
-        wsdl_path = os.path.join(self.root_dir, '..', self.config['wsdl'])
+        wsdl_path = os.path.join(self.root_dir, self.config['wsdl'])
         x = etree.parse(wsdl_path)
         r = x.getroot()
 
