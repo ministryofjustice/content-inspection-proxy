@@ -9,13 +9,13 @@ fixtures:
     data: check_prisoner_info
     success: 200
 
-  - name: get available timeslots
+  - name: get available timeslots with invalid data
     method: post
     url: /main
     headers:
       Content-Type: text/xml
     data: get_available_timeslots
-    success: 200
+    success: 500
 
   - name: test wsdl
     method: get

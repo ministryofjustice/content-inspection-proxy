@@ -35,7 +35,6 @@ for fixture in config['fixtures']:
         print 'Testing {}... '.format(fixture['name']),
         url = '{}{}'.format(config['base_url'], fixture['url']) \
             if fixture['url'][0] == '/' else fixture['url']
-        print url
         headers = config.get('base_headers', {})
         headers.update(fixture.get('headers', {}))
 
