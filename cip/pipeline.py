@@ -44,7 +44,7 @@ class Pipeline(object):
     def __call__(self, path=None):
         req_uuid = request.headers.get('x-request_id', str(uuid.uuid4()))
         req_start_dt = time.time()
-        # time.sleep(random.randint(0, 5))
+        # time.sleep(random.randint(0, 2))
         req_stat_name = 'request'
         if 'Content-Type' in request.headers \
                 and 'xml' in request.headers['Content-Type']:

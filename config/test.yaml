@@ -102,5 +102,5 @@ DEBUG: True
 
 log_file: ../cip.log
 
-collectd_host: 172.16.195.129
+collectd_host: 172.16.195.133
 collectd_port: 8125
