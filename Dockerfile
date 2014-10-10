@@ -1,4 +1,4 @@
-FROM moj-base:0.9.12
+FROM moj-base:latest
 RUN apt-get update
 RUN apt-get install -y libxml2-dev python-dev python-pip python-virtualenv libxslt1-dev zlib1g-dev
 ADD . /cip
