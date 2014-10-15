@@ -9,5 +9,6 @@ WORKDIR /cip/cip
 RUN pip install -r /cip/requirements.txt
 RUN mkdir -p /etc/service/gunicorn
 ADD gunicorn.service /etc/service/gunicorn/run
+RUN find /etc/service -name run -exec chmod +x \{\} \;
 EXPOSE 5000
 
