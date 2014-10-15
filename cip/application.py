@@ -1,6 +1,7 @@
 import json
 from logging import FileHandler
 from logging import Formatter
+import logging
 import os
 
 from flask import Flask
@@ -62,20 +63,20 @@ def app_maker(config_file="../config/config.yaml"):
     def dummy():
         return '<success>Bingo</success>'
 
-    open_config(app, config_file=config_file)
-
     if 'CIP_HIDE_ERRORS' in os.environ:
         app.config['hide_errors'] = True
 
-    log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' +\
-        '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' +\
-        '"payload": %(message)s}'
+    log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' + \
+              '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' + \
+              '"payload": %(message)s}'
 
-    app.debug_log_format = (log_fmt)
-
-    fh = FileHandler(app.config['log_file'])
-    fh.setFormatter(Formatter(log_fmt))
-    app.logger.addHandler(fh)
+    if 'log_file' in app.config:
+        fh = FileHandler(app.config['log_file'])
+        fh.setFormatter(Formatter(log_fmt))
+        app.logger.addHandler(fh)
+    else:
+        app.debug_log_format = log_fmt
+    open_config(app, config_file=config_file)
 
     setup_routes(app)
     return app

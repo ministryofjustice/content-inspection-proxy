@@ -69,10 +69,6 @@ pipelines:
       - handler: cip.handlers.soap.SoapHandlerMock
         xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
-        xml_config:
-          custom_def: config/moj.xsd
-          transformations:
-             xs:string: moj:LimitedString
 
       - handler: cip.handlers.request.RequestHandlerMock
         url: http://google.com/ws
@@ -100,7 +96,7 @@ hide_errors: false
 #flask options
 DEBUG: True
 
-log_file: ../cip.log
+#log_file: ../cip.log
 
-collectd_host: 172.16.195.133
+collectd_host: 172.16.195.135
 collectd_port: 8125
