@@ -70,13 +70,13 @@ def app_maker(config_file="../config/config.yaml"):
               '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' + \
               '"payload": %(message)s}'
 
+    open_config(app, config_file=config_file)
     if 'log_file' in app.config:
         fh = FileHandler(app.config['log_file'])
         fh.setFormatter(Formatter(log_fmt))
         app.logger.addHandler(fh)
     else:
         app.debug_log_format = log_fmt
-    open_config(app, config_file=config_file)
 
     setup_routes(app)
     return app

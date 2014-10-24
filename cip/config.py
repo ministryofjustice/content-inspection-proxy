@@ -34,4 +34,3 @@ def open_config(app, config_file):
         # we are using our loader as flask checks for keys in uppercase
         config = yaml.load(f.read(), UpperKeyLoader)
     app.config.from_object(type('', (object,), config))
-    app.logger.info(json.dumps("Opened config:{}".format(config_file)))
