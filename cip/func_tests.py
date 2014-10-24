@@ -18,7 +18,9 @@ methods = {
 
 soap_req_map = {
     'check_prisoner_info': soap_requests.soap_checkPrisonerInfo,
+    'check_domis_prisoner_info': soap_requests.soap_domis_checkPrisonerInfo,
     'get_available_timeslots': soap_requests.soap_getAvailableTimeSlots1,
+    'get_domis_available_timeslots': soap_requests.soap_domis_getAvailableTimeSlots1,
     'book_visit': soap_requests.soap_bookVisit_fixed,
 }
 

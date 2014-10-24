@@ -1,0 +1,28 @@
+base_url: http://127.0.0.1:49157
+
+fixtures:
+  - name: check prisoner info
+    method: post
+    url: /main
+    headers:
+      Content-Type: text/xml
+    data: check_domis_prisoner_info
+    success: 200
+
+  - name: get available timeslots with invalid data
+    method: post
+    url: /main
+    headers:
+      Content-Type: text/xml
+    data: get_domis_available_timeslots
+    success: 500
+
+  - name: test wsdl
+    method: get
+    url: /main?wsdl
+    success: 200
+
+  - name: test xsd
+    method: get
+    url: /main?xsd=1
+    success: 200
