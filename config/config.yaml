@@ -46,7 +46,7 @@ routes:
     pipeline: dummy
 
 hide_errors: false
-#log_file: cip.log
+log_file: /cip/cip/cip.log
 
 #flask options
 DEBUG: True
