@@ -12,7 +12,7 @@ pipelines:
         xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
         wsdl: config/wsdl.xml
-        service_url: http://172.22.16.3:5000/main
+        service_url: http://nomis.local/main
 
       - handler: cip.handlers.request.RequestHandler
         url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
