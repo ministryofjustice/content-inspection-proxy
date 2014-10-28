@@ -11,11 +11,11 @@ pipelines:
       - handler: cip.handlers.soap.SoapHandler
         xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd
-        wsdl: config/wsdl.xml
-        service_url: http://nomis.local/main
+        wsdl: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService?wsdl
+        service_url: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
       - handler: cip.handlers.request.RequestHandler
-        url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
+        url: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
   direct:
     methods:
@@ -23,7 +23,7 @@ pipelines:
 
     handlers:
       - handler: cip.handlers.request.RequestHandler
-        url: http://172.22.16.2:9006/PrisonVisitBookingService/PrisonVisitBookingOperationsService
+        url: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
   dummy:
     methods:
@@ -40,13 +40,13 @@ pipelines:
 routes:
   /ws:
     pipeline: direct
-  /main:
+  /PrisonVisitBookingService/PrisonVisitBookingOperationsService:
     pipeline: main
   /dummy:
     pipeline: dummy
 
 hide_errors: false
-log_file: /cip/cip/cip.log
+#log_file: /cip/cip/cip.log
 
 #flask options
 DEBUG: True

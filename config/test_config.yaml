@@ -3,7 +3,7 @@ base_url: http://127.0.0.1:5000
 fixtures:
   - name: check prisoner info
     method: post
-    url: /main
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService
     headers:
       Content-Type: text/xml
     data: check_prisoner_info
@@ -11,7 +11,7 @@ fixtures:
 
   - name: get available timeslots with invalid data
     method: post
-    url: /main
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService
     headers:
       Content-Type: text/xml
     data: get_available_timeslots
@@ -19,10 +19,10 @@ fixtures:
 
   - name: test wsdl
     method: get
-    url: /main?wsdl
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService?wsdl
     success: 200
 
   - name: test xsd
     method: get
-    url: /main?xsd=1
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService?xsd=1
     success: 200

@@ -5,11 +5,16 @@ import cip
 from cip.handler import BaseHandler
 from cip.lru import lru_cache
 
+
 class SoapValidationException(Exception):
     pass
 
 
 class RequestTooLargeException(Exception):
+    pass
+
+
+class EmptyRequestException(Exception):
     pass
 
 
@@ -47,14 +52,20 @@ class SoapHandler(BaseHandler):
             raise RequestTooLargeException
 
         parser = etree.XMLParser(resolve_entities=False, no_network=True)
-        soap_request = etree.fromstring(request.data, parser=parser)
+        if request.data:
+            soap_request = etree.fromstring(request.data, parser=parser)
+        else:
+            raise EmptyRequestException
         # If the request contains invalid XML then the following will throw
         # an exception that will be handled by the pipeline handling code.
         self.schema.assertValid(soap_request)
 
     @lru_cache(maxsize=16)
     def handle_wsdl_request(self):
-        wsdl_path = os.path.join(self.root_dir, self.config['wsdl'])
+        if len(self.config['wsdl']) > 4 and self.config['wsdl'][0:4] == 'http':
+            wsdl_path = self.config['wsdl']
+        else:
+            wsdl_path = os.path.join(self.root_dir, self.config['wsdl'])
         x = etree.parse(wsdl_path)
         r = x.getroot()
 
@@ -85,9 +96,9 @@ class SoapHandler(BaseHandler):
         elif 'xsd' in request.args:
             with open(self.xsd_path) as xsd:
                 data = xsd.read()
-                return (data, 200, {'Content-Type': 'application/xml'})
+                return data, 200, {'Content-Type': 'application/xml'}
         else:
-            return(request.args, 404, {})
+            return request.args, 404, {}
 
 
 class SoapHandlerMock(SoapHandler):
