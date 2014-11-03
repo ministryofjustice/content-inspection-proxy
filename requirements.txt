@@ -4,3 +4,4 @@ PyYAML
 flask
 gunicorn
 gevent
+redis

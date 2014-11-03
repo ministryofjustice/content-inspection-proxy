@@ -36,16 +36,24 @@ class SoapHandler(BaseHandler):
         soap_xsd_parsed.getroot().insert(0, xsd_import)
         self.schema = etree.XMLSchema(soap_xsd_parsed)
 
-    def base_method(self, request, path=None, method=None):
-        methods = {'get': self.get,
-                   'post': self.post}
-        method = methods.get(method, path)
-        if not method:
-            raise SoapValidationException(
-                "method ({}) is not allowed".format(request.method.lower()))
-        return method(request, path=path)
+    def get(self, request, path=None, next_handler=None):
+        """
+        On get we terminate request by retuning wsdl, xsd or 404.
+        :param request:
+        :param path:
+        :param next_handler:
+        :return:
+        """
+        if 'wsdl' in request.args:
+            return self.handle_wsdl_request()
+        elif 'xsd' in request.args:
+            with open(self.xsd_path) as xsd:
+                data = xsd.read()
+                return data, 200, {'Content-Type': 'application/xml'}
+        else:
+            return request.args, 404, {}
 
-    def post(self, request, path=None):
+    def post(self, request, path=None, next_handler=None):
         request_size = self.config.get('request_size', 8192)
 
         if len(request.data) > request_size:
@@ -59,7 +67,11 @@ class SoapHandler(BaseHandler):
         # If the request contains invalid XML then the following will throw
         # an exception that will be handled by the pipeline handling code.
         self.schema.assertValid(soap_request)
+        response = next_handler()
+        #alter me
+        return response
 
+    #TODO: add invalidation after i.e. 15mins
     @lru_cache(maxsize=16)
     def handle_wsdl_request(self):
         if len(self.config['wsdl']) > 4 and self.config['wsdl'][0:4] == 'http':
@@ -90,18 +102,8 @@ class SoapHandler(BaseHandler):
         return (etree.tostring(r, pretty_print=True, xml_declaration=True),
                 200, {'Content-Type': 'application/xml'})
 
-    def get(self, request, path=None):
-        if 'wsdl' in request.args:
-            return self.handle_wsdl_request()
-        elif 'xsd' in request.args:
-            with open(self.xsd_path) as xsd:
-                data = xsd.read()
-                return data, 200, {'Content-Type': 'application/xml'}
-        else:
-            return request.args, 404, {}
-
 
 class SoapHandlerMock(SoapHandler):
-    def post(self, request, path=None):
+    def post(self, request, path=None, next_handler=None):
         super(SoapHandlerMock, self).post(request, path)
-        return ("requested:{}".format(path), 200, {})
+        return "requested:{}".format(path), 200, {}

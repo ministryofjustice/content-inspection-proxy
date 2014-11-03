@@ -1,5 +1,8 @@
+import json
 import importlib
 import os
+import time
+from cip import common
 
 
 class HandlerNotImplementedException(NotImplementedError):
@@ -7,24 +10,41 @@ class HandlerNotImplementedException(NotImplementedError):
 
 
 class BaseHandler(object):
+    """
+    when inheriting implement methods like get, post,...
+    you can use mixins
+
+    Note that this object is initialized at the application start and persists within pipeline
+
+    """
 
     def __init__(self, **kwargs):
         self.config = kwargs
         self.log = kwargs['logger']
+        self.handler_name = kwargs['handler_name']
 
-    def __call__(self, request, path=None):
+    def __call__(self, request, path=None, next_handler=None):
+        """
+        Based on request.method calls appropriate function
+        If request function does not exist than raises HandlerNotImplementedException
+        """
+        req_uuid = request.headers.get('x-request_id', str(uuid.uuid4()))
+        req_start_dt = time.time()
+        self.log.debug(json.dumps(
+            "[{}] Executing handler:{} with path:{}".format(
+                req_uuid, self.__class__, path)))
         req_method = request.method.lower()
         method_func = getattr(self, req_method)
         if method_func is None:
             raise HandlerNotImplementedException(req_method)
-        self.req_method = req_method
-        return method_func(request, path)
+        response = method_func(request, path)
+
+        common.post_stat(self.handler_name,
+                         common.get_duration(req_start_dt), 'ms')
+        return response
 
     def url(self, path=None):
-        if 'CIP_REQ_URL' in os.environ:
-            baseurl = os.environ['CIP_REQ_URL']
-        else:
-            baseurl = self.config['url']
+        baseurl = self.config['url']
         if path:
             if baseurl.endswith('/'):
                 return "{}{}".format(baseurl, path)
@@ -33,17 +53,25 @@ class BaseHandler(object):
         else:
             return baseurl
 
-    def get(self, request, path=None):
-        return self.base_method(request, path=None, method='get')
 
-    def head(self, request, path=None):
-        return self.base_method(request, path=None, method='head')
-
-    def post(self, request, path=None):
-        return self.base_method(request, path=None, method='post')
-
-    def base_method(self, request, path=None, method=None):
+class BaseHandlerMixin(object):
+    def base_method(self, request, path=None, method=None, next_handler=None):
         raise HandlerNotImplementedException(method)
+
+
+class GetHandlerMixin(BaseHandlerMixin):
+    def get(self, request, path=None, next_handler=None):
+        return self.base_method(request, path=path, method='get', next_handler=next_handler)
+
+
+class PostHandlerMixin(BaseHandlerMixin):
+    def post(self, request, path=None, next_handler=None):
+        return self.base_method(request, path=path, method='post', next_handler=next_handler)
+
+
+class HeadHandlerMixin(BaseHandlerMixin):
+    def head(self, request, path=None, next_handler=None):
+        return self.base_method(request, path=path, method='head', next_handler=next_handler)
 
 
 def get_handler(class_name, **kwargs):

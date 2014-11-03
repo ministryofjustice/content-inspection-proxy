@@ -8,6 +8,9 @@ pipelines:
       - get
 
     handlers:
+      - handler: cip.handlers.throttling.ThrottlingHandler
+        limit: 1800
+
       - handler: cip.handlers.soap.SoapHandler
         xsd: config/nomis.xsd
         soap_xsd: config/soap.xsd

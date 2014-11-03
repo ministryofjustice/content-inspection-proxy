@@ -1,5 +1,5 @@
 import socket
-
+import time
 from flask import current_app
 
 xml_error = '''
@@ -29,3 +29,9 @@ def post_stat(key, value, stat_type):
         # Just log it and set an alert on the fact that we somehow
         # failed miserably.
         logger.exception('Error while sending stats.')
+
+
+# default is microseconds
+def get_duration(req_start_dt, multiplier=1000000):
+    end_dt = time.time()
+    return int((end_dt - req_start_dt) * multiplier)
