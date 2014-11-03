@@ -14,6 +14,11 @@ from cip.handler import HandlerNotImplementedException
 from cip import common
 
 
+DEFAULT_METHODS = [
+    'get'
+]
+
+
 class PipelineException(Exception):
     pass
 
@@ -22,6 +27,7 @@ class Pipeline(object):
     def __init__(self, pipeline_config, logger=getLogger(__name__)):
         self.handlers = []
         self.log = logger
+        self.methods = pipeline_config.get('methods', DEFAULT_METHODS)
         for handler_config in pipeline_config['handlers']:
             handler_config['logger'] = self.log
             handler_config['handler_name'] = handler_config['handler'].split('.')[-1]

@@ -22,7 +22,7 @@ class ThrottlingHandler(BaseHandler):
         super(ThrottlingHandler, self).__init__(**kwargs)
         self.redis_key_prefix = self.config.get('redis_key_prefix', 'global-rate-limit')
         self.redis_url = self.config.get('redis_url', None)
-        self.redis = Redis(self.config['redis_url'])
+        self.redis = Redis(self.redis_url)
         self.limit = self.config['limit']
         self.per = self.config.get('per', 60)
         self.expiration_window = self.config.get('expiration_window', 0)
