@@ -51,7 +51,6 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
 
     def base_method(self, request, path=None, method=None, next_handler=None):
         # let's make sure we haven't been misconfigured
-        assert next_handler is None
         method_dict = {
             'get': requests.get,
             'post': requests.post,
@@ -70,13 +69,11 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
 
 class RequestHandlerMock(RequestHandler):
     def get(self, request, path=None, next_handler=None):
-        assert next_handler is None
         url = self.url(path)
         self.log.debug(json.dumps("Mocking GET {}".format(url)))
         return "requested:{}".format(urlsplit(url).path), 200, {}
 
     def post(self, request, path=None, next_handler=None):
-        assert next_handler is None
         url = self.url(path)
         self.log.debug(json.dumps("Mocking POST {}".format(url)))
         return "requested:{}".format(urlsplit(url).path), 200, {}

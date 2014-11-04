@@ -1,7 +1,6 @@
 import json
 from logging import FileHandler
 from logging import Formatter
-import logging
 import os
 
 from flask import Flask
@@ -24,7 +23,7 @@ def setup_routes(app):
 
     pipelines = {}
     for name in app.config.get('pipelines').keys():
-        pipelines[name] = Pipeline(app.config['pipelines'][name], app.logger)
+        pipelines[name] = Pipeline(app.config['pipelines'][name], pipeline_name=name, logger=app.logger)
 
     index = 0
     for route, route_config in app.config.get('routes').iteritems():

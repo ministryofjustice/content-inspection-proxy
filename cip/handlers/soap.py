@@ -105,5 +105,5 @@ class SoapHandler(BaseHandler):
 
 class SoapHandlerMock(SoapHandler):
     def post(self, request, path=None, next_handler=None):
-        super(SoapHandlerMock, self).post(request, path)
+        super(SoapHandlerMock, self).post(request, path, next_handler=next_handler)
         return "requested:{}".format(path), 200, {}

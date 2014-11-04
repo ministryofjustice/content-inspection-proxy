@@ -38,7 +38,7 @@ class BaseHandler(object):
         method_func = getattr(self, req_method)
         if method_func is None:
             raise HandlerNotImplementedException(req_method)
-        response = method_func(request, path)
+        response = method_func(request, path, next_handler=next_handler)
 
         common.post_stat(self.handler_name,
                          common.get_duration(req_start_dt), 'ms')

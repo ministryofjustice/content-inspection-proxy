@@ -60,5 +60,14 @@ class CIPTestCase(unittest.TestCase):
         response = self.app.post('/soap', data=soap_bookVisit_expansion)
         self.assertEqual(response.status_code, 500)
 
+    def test_throttling(self):
+        response = self.app.get('/throttling')
+        self.assertEqual(response.status_code, 200)
+        response = self.app.get('/throttling')
+        self.assertEqual(response.status_code, 429)
+        time.sleep(1)
+        response = self.app.get('/throttling')
+        self.assertEqual(response.status_code, 200)
+
 if __name__ == '__main__':
     unittest.main()

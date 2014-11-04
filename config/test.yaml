@@ -72,6 +72,18 @@ pipelines:
       - handler: cip.handlers.request.RequestHandlerMock
         url: http://google.com/ws
 
+  test_throttling:
+    methods:
+      - get
+    handlers:
+      - handler: cip.handlers.throttling.ThrottlingHandler
+        limit: 1
+        per: 1
+
+      - handler: cip.handlers.request.RequestHandlerMock
+        url: http://google.com/
+
+
 routes:
   /test:
     pipeline: test
@@ -90,6 +102,9 @@ routes:
 
   /little_soap:
     pipeline: test_small_soap
+
+  /throttling:
+    pipeline: test_throttling
 
 hide_errors: false
 #flask options

@@ -1,12 +1,12 @@
 from logging import getLogger
 import functools
-import random
 import uuid
 import traceback
 import json
 import time
+import copy
 
-from flask import request, make_response
+from flask import request
 from flask import current_app
 
 from cip.handler import get_handler
@@ -24,14 +24,16 @@ class PipelineException(Exception):
 
 
 class Pipeline(object):
-    def __init__(self, pipeline_config, logger=getLogger(__name__)):
+    def __init__(self, pipeline_config, pipeline_name=None, logger=getLogger(__name__)):
         self.handlers = []
         self.log = logger
         self.methods = pipeline_config.get('methods', DEFAULT_METHODS)
-        for handler_config in pipeline_config['handlers']:
+        self.pipeline_name = pipeline_name
+
+        for config in pipeline_config['handlers']:
+            handler_config = copy.deepcopy(config)  # let's safeguard handlers
             handler_config['logger'] = self.log
             handler_config['handler_name'] = handler_config['handler'].split('.')[-1]
-
             handler = get_handler(handler_config['handler'], **handler_config)
             self.handlers.append(handler)
 
@@ -39,18 +41,20 @@ class Pipeline(object):
         req_uuid = request.headers.get('x-request_id', str(uuid.uuid4()))
         req_start_dt = time.time()
         req_stat_name = 'request'
+
         if 'Content-Type' in request.headers \
                 and 'xml' in request.headers['Content-Type']:
             out = common.xml_error
             resp_headers = {'Content-Type': 'application/xml'}
-
         else:
             out = '{}'
             resp_headers = {}
         hide_errors = current_app.config.get('hide_errors', True)
 
-        # creates chain of handlers h0(h1(h2()))
-        chained_handler = self.handlers[-1]
+        # creates chain of handlers h0(h1(h2))
+        def unimplemented_handler():
+            pass
+        chained_handler = unimplemented_handler
         for handler in reversed(self.handlers):
             chained_handler = functools.partial(handler, next_handler=chained_handler, request=request, path=path)
 
@@ -96,6 +100,7 @@ class Pipeline(object):
             # resp = make_response(payload, status_code)
             # resp.headers = dict(headers)
             return payload, status_code, dict(headers)
+
         common.post_stat('no_response', '+1', 'c')
         common.post_stat(req_stat_name, common.get_duration(req_start_dt), 'ms')
         msg = {
@@ -105,6 +110,7 @@ class Pipeline(object):
             'request_data': str(request.data)
         }
         self.log.error(json.dumps(msg))
+
         if hide_errors:
             return out.format(req_uuid), 500, resp_headers
         else:
