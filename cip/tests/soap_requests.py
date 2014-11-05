@@ -19,6 +19,26 @@ soap_checkPrisonerInfo = """\
 </env:Envelope>
 """
 
+soap_checkPrisonerInfo_domis = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tns="http://services.pvb.nomis.syscon.net/"
+        xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+    <env:Body>
+        <tns:checkPrisonerInfo>
+            <prisonerInfo>
+                <forename>Lynn</forename>
+                <surname>Able</surname>
+                <dateOfBirth>1977-06-15T00:00:00</dateOfBirth>
+                <number>b2793za</number>
+                <prisonId>RCI</prisonId>
+            </prisonerInfo>
+        </tns:checkPrisonerInfo>
+    </env:Body>
+</env:Envelope>
+"""
+
 soap_getAvailableTimeSlots1 = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"

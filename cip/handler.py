@@ -13,7 +13,9 @@ class HandlerNotImplementedException(NotImplementedError):
 class BaseHandler(object):
     """
     when inheriting implement methods like get, post,...
-    you can use mixins
+    you can use mixins GetHandlerMixin, PostHandlerMixin,...
+
+    make sure you validate config in __init__
 
     Note that this object is initialized at the application start and persists within pipeline
 
@@ -39,6 +41,13 @@ class BaseHandler(object):
         if method_func is None:
             raise HandlerNotImplementedException(req_method)
         response = method_func(request, path, next_handler=next_handler)
+        if response:
+            code = response[1]
+        else:
+            code = None
+        self.log.debug(json.dumps(
+            "[{}] Response from handler:{} with path:{} code:{}".format(
+                req_uuid, self.__class__, path, code)))
 
         common.post_stat(self.handler_name,
                          common.get_duration(req_start_dt), 'ms')

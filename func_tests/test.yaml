@@ -1,0 +1,45 @@
+base_url: http://docker:5000
+
+fixtures:
+  - name: test throttling 1
+    method: get
+    url: /health
+    success: 200
+
+  - name: test throttling 2
+    method: get
+    url: /health
+    success: 429
+    sleep: 1
+
+  - name: test throttling 3
+    method: get
+    url: /health
+    success: 200
+
+  - name: get available timeslots with invalid data
+    method: post
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService
+    headers:
+      Content-Type: text/xml
+    data: get_available_timeslots
+    success: 500
+
+  - name: test wsdl
+    method: get
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService?wsdl
+    success: 200
+
+  - name: test xsd
+    method: get
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService?xsd
+    success: 200
+
+  - name: check prisoner info
+    method: post
+    url: /PrisonVisitBookingService/PrisonVisitBookingOperationsService
+    headers:
+      Content-Type: text/xml
+    data: check_prisoner_info_domis
+    success: 200
+

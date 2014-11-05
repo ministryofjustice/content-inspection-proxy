@@ -35,6 +35,7 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
         super(RequestHandler, self).__init__(**kwargs)
         if 'CIP_REQ_URL' in os.environ:
             self.config['url'] = os.environ['CIP_REQ_URL']
+            self.log.debug("updating request to use url: {}".format(self.config['url']))
 
     @classmethod
     def sanitize_headers(cls, headers):
@@ -61,7 +62,7 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
         self.log.debug(json.dumps("Requesting {}: {}".format(
             request.method.upper(), url)))
         headers = self.sanitize_headers(request.headers)
-        request_method = method_dict[method_dict.keys()]
+        request_method = method_dict[request.method.lower()]
         response = request_method(url, request.data, headers=headers)
         response.headers = self.sanitize_headers(response.headers)
         return response.text, response.status_code, response.headers.items()

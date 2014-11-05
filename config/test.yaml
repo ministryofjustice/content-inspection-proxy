@@ -80,8 +80,9 @@ pipelines:
         limit: 1
         per: 1
 
-      - handler: cip.handlers.request.RequestHandlerMock
-        url: http://google.com/
+      - handler: cip.handlers.utils.ReturningHandler
+        code: 200
+        data: OK
 
 
 routes:

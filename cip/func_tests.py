@@ -2,10 +2,11 @@ import os
 import traceback
 import sys
 import yaml
+import time
 import requests
 from tests import soap_requests
 
-cfg = 'config/test_config.yaml'\
+cfg = 'func_tests/test.yaml'\
     if 'CIP_FT_CFG' not in os.environ else os.environ['CIP_FT_CFG']
 
 with open(cfg) as cfg_file:
@@ -18,6 +19,7 @@ methods = {
 
 soap_req_map = {
     'check_prisoner_info': soap_requests.soap_checkPrisonerInfo,
+    'check_prisoner_info_domis': soap_requests.soap_checkPrisonerInfo_domis,
     'check_domis_prisoner_info': soap_requests.soap_domis_checkPrisonerInfo,
     'get_available_timeslots': soap_requests.soap_getAvailableTimeSlots1,
     'get_domis_available_timeslots': soap_requests.soap_domis_getAvailableTimeSlots1,
@@ -34,9 +36,10 @@ DEBUG = os.environ.get('DEBUG', False)
 
 for fixture in config['fixtures']:
     try:
-        print 'Testing {}... '.format(fixture['name']),
+        print 'Testing {}... '.format(fixture['name'])
         url = '{}{}'.format(config['base_url'], fixture['url']) \
             if fixture['url'][0] == '/' else fixture['url']
+        print "url: {}".format(url)
         headers = config.get('base_headers', {})
         headers.update(fixture.get('headers', {}))
 
@@ -69,6 +72,12 @@ for fixture in config['fixtures']:
         fail += 1
         if DEBUG:
             print traceback.format_exc()
+
+    #ugly
+    if 'sleep' in fixture.keys():
+        time.sleep(fixture['sleep'])
+    print
+
 
 print '\n\nFailed: {} out of {}'.format(fail, total)
 if fail:

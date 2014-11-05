@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Starting redis"
+exec /usr/bin/redis-server /etc/redis/redis.conf --daemonize no

@@ -58,13 +58,11 @@ def setup_routes(app):
 
 def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
-    @app.route('/dummy', methods=['POST'])
-    def dummy():
-        return '<success>Bingo</success>'
 
     if 'CIP_HIDE_ERRORS' in os.environ:
         app.config['hide_errors'] = True
 
+    #TODO: use json.dumps to create safe output
     log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' + \
               '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' + \
               '"payload": %(message)s}'
