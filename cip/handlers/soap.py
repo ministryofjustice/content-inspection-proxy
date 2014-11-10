@@ -68,7 +68,7 @@ class SoapHandler(BaseHandler):
         # an exception that will be handled by the pipeline handling code.
         self.schema.assertValid(soap_request)
         response = next_handler()
-        #alter me
+        #TODO: update response by altering API server name with one from request header (as seen by client)
         return response
 
     #TODO: add invalidation after i.e. 15mins

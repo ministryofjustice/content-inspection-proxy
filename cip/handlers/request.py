@@ -50,7 +50,7 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
                 new_headers.pop(header, None)
         return new_headers
 
-    def base_method(self, request, path=None, method=None, next_handler=None):
+    def base_request_methods(self, request, path=None, method=None, next_handler=None):
         # let's make sure we haven't been misconfigured
         method_dict = {
             'get': requests.get,
