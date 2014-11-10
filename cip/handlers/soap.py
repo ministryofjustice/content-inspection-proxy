@@ -71,7 +71,6 @@ class SoapHandler(BaseHandler):
         #TODO: update response by altering API server name with one from request header (as seen by client)
         return response
 
-    #TODO: add invalidation after i.e. 15mins
     @lru_cache(maxsize=16)
     def handle_wsdl_request(self):
         if len(self.config['wsdl']) > 4 and self.config['wsdl'][0:4] == 'http':

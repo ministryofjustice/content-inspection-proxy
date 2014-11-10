@@ -8,14 +8,20 @@ expected config:
     per: 1 (default seconds)
     expiration_window: 0 (default)
 
-make sure to assign different redis_key_prefix for each rate limiting bucket
+Above configuration can be read as:
+Let's limit the pipeline to 60 requests per 1s. Where expiration window is 0s as we believe that all clients will have
+fully synchronised clocks. On top of it let's connect to local redis and prefix all keys with global-rate-limit.
 
-based on: http://flask.pocoo.org/snippets/70/
+Make sure to assign different redis_key_prefix for each rate limiting bucket
+
+Based on: http://flask.pocoo.org/snippets/70/
 """
 import time
+
 from redis import Redis
 from cip.handler import BaseHandler
 
+HTTP_TOO_MANY_REQUESTS = 429
 
 class ThrottlingHandler(BaseHandler):
     def __init__(self, **kwargs):
@@ -37,10 +43,10 @@ class ThrottlingHandler(BaseHandler):
 
         slot_value = p.execute()[0]
 
-#        remaining = max(self.limit - slot_value, 0)
+        # remaining = max(self.limit - slot_value, 0)
         is_over_limit = slot_value > self.limit
 
         if is_over_limit:
-            return "", 429, {}
+            return "", HTTP_TOO_MANY_REQUESTS, {}
 
         return next_handler()

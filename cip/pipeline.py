@@ -31,7 +31,8 @@ class Pipeline(object):
         self.pipeline_name = pipeline_name
 
         for config in pipeline_config['handlers']:
-            handler_config = copy.deepcopy(config)  # let's safeguard handlers
+            # deep-copy config so that handlers can't poison it for handlers in different pipelines
+            handler_config = copy.deepcopy(config)
             handler_config['logger'] = self.log
             handler_config['handler_name'] = handler_config['handler'].split('.')[-1]
             handler = get_handler(handler_config['handler'], **handler_config)
@@ -52,9 +53,9 @@ class Pipeline(object):
         hide_errors = current_app.config.get('hide_errors', True)
 
         # creates chain of handlers h0(h1(h2))
-        def unimplemented_handler():
+        def null_handler():
             pass
-        chained_handler = unimplemented_handler
+        chained_handler = null_handler
         for handler in reversed(self.handlers):
             chained_handler = functools.partial(handler, next_handler=chained_handler, request=request, path=path)
 
@@ -97,8 +98,6 @@ class Pipeline(object):
                 }
                 self.log.error(json.dumps(msg))
                 payload = out.format(req_uuid) if hide_errors else payload
-            # resp = make_response(payload, status_code)
-            # resp.headers = dict(headers)
             return payload, status_code, dict(headers)
 
         common.post_stat('no_response', '+1', 'c')
