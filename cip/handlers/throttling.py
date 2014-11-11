@@ -15,6 +15,10 @@ fully synchronised clocks. On top of it let's connect to local redis and prefix 
 Make sure to assign different redis_key_prefix for each rate limiting bucket
 
 Based on: http://flask.pocoo.org/snippets/70/
+
+Idea is that we divide time into small slots (duration of slot = 'per').
+Each slot is assigned a temporary counter that we store in redis.
+Whenever we process request we will increment the current slot and if over the 'limit' than we will drop the request.
 """
 import time
 
@@ -34,13 +38,17 @@ class ThrottlingHandler(BaseHandler):
         self.expiration_window = self.config.get('expiration_window', 0)
 
     def __call__(self, request, path=None, next_handler=None):
+        # let's calculate the end time of slot
         reset = (int(time.time()) // self.per) * self.per + self.per
+
+        # let's get redis key from slot end time
         slot_key = "{}-{}".format(self.redis_key_prefix, reset)
 
         p = self.redis.pipeline()
         p.incr(slot_key)
         p.expireat(slot_key, reset + self.expiration_window)
 
+        # what is out current slot usage?
         slot_value = p.execute()[0]
 
         # remaining = max(self.limit - slot_value, 0)
