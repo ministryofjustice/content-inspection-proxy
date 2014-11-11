@@ -6,4 +6,4 @@ gunicorn
 gevent
 redis
 statsd
-logstash
+python-logstash
