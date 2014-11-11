@@ -66,11 +66,19 @@ routes:
   /health:
     pipeline: health
 
-hide_errors: false
 #log_file: /cip/cip/cip.log
 
 #flask options
 DEBUG: True
 
-collectd_host: 127.0.0.1
-collectd_port: 8125
+statsd:
+  enabled: True
+  host: 127.0.0.1
+  port: 8125
+  prefix: 'cip'
+
+logstash:
+  enabled: True
+  host: 127.0.0.1
+  port: 5959
+  version: 1

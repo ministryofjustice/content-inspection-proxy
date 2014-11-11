@@ -5,3 +5,5 @@ flask
 gunicorn
 gevent
 redis
+statsd
+logstash

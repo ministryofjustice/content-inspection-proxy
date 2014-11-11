@@ -12,7 +12,7 @@ from flask import current_app
 from cip.handler import get_handler
 from cip.handler import HandlerNotImplementedException
 from cip import common
-
+from cip.stats import get_duration_ms
 
 DEFAULT_METHODS = [
     'get'
@@ -50,7 +50,6 @@ class Pipeline(object):
         else:
             out = '{}'
             resp_headers = {}
-        hide_errors = current_app.config.get('hide_errors', True)
 
         # creates chain of handlers h0(h1(h2))
         def null_handler():
@@ -62,14 +61,15 @@ class Pipeline(object):
         try:
             response = chained_handler()
         except HandlerNotImplementedException:
-            common.post_stat('unknown_handler', '+1', 'c')
-            common.post_stat('error', '+1', 'c')
-            if hide_errors:
+            current_app.stats_client.incr('unknown_handler', 1)
+            current_app.stats_client.incr('error', 1)
+            if not current_app.debug:
                 return out.format(req_uuid), 404, resp_headers
             else:
                 return out.format(traceback.format_exc()), 404, resp_headers
         except Exception:
-            common.post_stat('error', '+1', 'c')
+
+            current_app.stats_client.incr('error', 1)
             msg = {
                 'request_id': req_uuid,
                 'message': traceback.format_exc(),
@@ -77,16 +77,15 @@ class Pipeline(object):
                 'request_data': str(request.data)
             }
             self.log.error(json.dumps(msg))
-            if hide_errors:
+            if not current_app.debug:
                 return out.format(req_uuid), 500, resp_headers
             else:
                 return out.format(traceback.format_exc()), 500, resp_headers
         finally:
-            common.post_stat(req_stat_name,
-                             common.get_duration(req_start_dt), 'ms')
+            current_app.stats_client.timing(req_stat_name, get_duration_ms(req_start_dt))
 
         if response:
-            common.post_stat('success', '+1', 'c')
+            current_app.stats_client.incr('success', 1)
             payload, status_code, headers = response
             if 300 > status_code < 200:
                 msg = {
@@ -97,11 +96,11 @@ class Pipeline(object):
                     'status_code': str(status_code)
                 }
                 self.log.error(json.dumps(msg))
-                payload = out.format(req_uuid) if hide_errors else payload
+                payload = out.format(req_uuid) if not current_app.debug else payload
             return payload, status_code, dict(headers)
 
-        common.post_stat('no_response', '+1', 'c')
-        common.post_stat(req_stat_name, common.get_duration(req_start_dt), 'ms')
+        current_app.stats_client.incr('no_response', 1)
+        current_app.stats_client.timing(req_stat_name, get_duration_ms(req_start_dt))
         msg = {
             'request_id': req_uuid,
             'message': 'No response from handlers',
@@ -110,7 +109,7 @@ class Pipeline(object):
         }
         self.log.error(json.dumps(msg))
 
-        if hide_errors:
+        if not current_app.debug:
             return out.format(req_uuid), 500, resp_headers
         else:
             return out.format('No response from handlers'), 500, resp_headers

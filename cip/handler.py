@@ -3,7 +3,9 @@ import importlib
 import time
 import uuid
 
-from cip import common
+from flask import current_app
+
+from cip.stats import get_duration_ms
 
 
 class HandlerNotImplementedException(NotImplementedError):
@@ -49,8 +51,7 @@ class BaseHandler(object):
             "[{}] Response from handler:{} with path:{} code:{}".format(
                 req_uuid, self.__class__, path, code)))
 
-        common.post_stat(self.handler_name,
-                         common.get_duration(req_start_dt), 'ms')
+        current_app.stats_client.timing(self.handler_name, get_duration_ms(req_start_dt))
         return response
 
     def url(self, path=None):
