@@ -1,3 +1,4 @@
+import httplib
 from cip.handler import BaseHandler
 
 
