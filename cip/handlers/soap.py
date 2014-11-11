@@ -1,4 +1,5 @@
 import os
+import httplib
 from lxml import etree
 
 import cip
@@ -49,9 +50,9 @@ class SoapHandler(BaseHandler):
         elif 'xsd' in request.args:
             with open(self.xsd_path) as xsd:
                 data = xsd.read()
-                return data, 200, {'Content-Type': 'application/xml'}
+                return data, httplib.OK, {'Content-Type': 'application/xml'}
         else:
-            return request.args, 404, {}
+            return request.args, httplib.NOT_FOUND, {}
 
     def post(self, request, path=None, next_handler=None):
         request_size = self.config.get('request_size', 8192)
@@ -99,10 +100,10 @@ class SoapHandler(BaseHandler):
         except:
             self.log.debug('Failed to set service url')
         return (etree.tostring(r, pretty_print=True, xml_declaration=True),
-                200, {'Content-Type': 'application/xml'})
+                httplib.OK, {'Content-Type': 'application/xml'})
 
 
 class SoapHandlerMock(SoapHandler):
     def post(self, request, path=None, next_handler=None):
         super(SoapHandlerMock, self).post(request, path, next_handler=next_handler)
-        return "requested:{}".format(path), 200, {}
+        return "requested:{}".format(path), httplib.OK, {}

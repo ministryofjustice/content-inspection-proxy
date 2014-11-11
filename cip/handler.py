@@ -35,9 +35,8 @@ class BaseHandler(object):
         """
         req_uuid = request.headers.get('x-request_id', str(uuid.uuid4()))
         req_start_dt = time.time()
-        self.log.debug(json.dumps(
-            "[{}] Executing handler:{} with path:{}".format(
-                req_uuid, self.__class__, path)))
+        self.log.debug("[{}] Executing handler:{} with path:{}".format(
+                       req_uuid, self.__class__, path))
         req_method = request.method.lower()
         method_func = getattr(self, req_method)
         if method_func is None:
@@ -47,9 +46,8 @@ class BaseHandler(object):
             code = response[1]
         else:
             code = None
-        self.log.debug(json.dumps(
-            "[{}] Response from handler:{} with path:{} code:{}".format(
-                req_uuid, self.__class__, path, code)))
+        self.log.debug("[{}] Response from handler:{} with path:{} code:{}".format(
+                       req_uuid, self.__class__, path, code))
 
         current_app.stats_client.timing(self.handler_name, get_duration_ms(req_start_dt))
         return response

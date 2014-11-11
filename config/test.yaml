@@ -84,6 +84,17 @@ pipelines:
         code: 200
         data: OK
 
+  test_latency:
+    methods:
+      - get
+    handlers:
+      - handler: cip.handlers.latency.LatencyHandler
+        delay_request: 0.3
+        delay_response: 0.3
+
+      - handler: cip.handlers.utils.ReturningHandler
+        code: 200
+        data: OK
 
 routes:
   /test:
@@ -107,8 +118,11 @@ routes:
   /throttling:
     pipeline: test_throttling
 
+  /latency:
+    pipeline: test_latency
+
 #flask options
-DEBUG: True
+DEBUG: False
 
 #log_file: ../cip.log
 

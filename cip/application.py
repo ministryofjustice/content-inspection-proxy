@@ -46,7 +46,7 @@ def setup_routes(app):
                              strict_slashes=False,
                              methods=pipelines[pipeline_name].methods)
 
-        app.logger.debug(json.dumps("Added route: {}".format(route)))
+        app.logger.debug("Added route: {}".format(route))
         index += 1
         # Place dummy handler
     return app

@@ -17,7 +17,7 @@ class ReturningHandler(BaseHandler):
     def __init__(self, **kwargs):
         super(ReturningHandler, self).__init__(**kwargs)
         self.data = self.config.get('data', '')
-        self.code = self.config.get('code', 200)
+        self.code = self.config.get('code', httplib.OK)
         self.headers = self.config.get('headers', {})
 
     def __call__(self, request, path=None, next_handler=None):

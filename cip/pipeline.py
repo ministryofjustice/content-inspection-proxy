@@ -2,9 +2,9 @@ from logging import getLogger
 import functools
 import uuid
 import traceback
-import json
 import time
 import copy
+import httplib
 
 from flask import request
 from flask import current_app
@@ -67,35 +67,34 @@ class Pipeline(object):
                 return out.format(req_uuid), 404, resp_headers
             else:
                 return out.format(traceback.format_exc()), 404, resp_headers
-        except Exception:
+        except Exception as e:
 
             current_app.stats_client.incr('error', 1)
             msg = {
                 'request_id': req_uuid,
-                'message': traceback.format_exc(),
+                'exception': traceback.format_exc(),
                 'headers': str(request.headers),
                 'request_data': str(request.data)
             }
-            self.log.error(json.dumps(msg))
+            self.log.error("Exception: {} {}".format(type(e), str(e)), extra=msg)
             if not current_app.debug:
-                return out.format(req_uuid), 500, resp_headers
+                return out.format(req_uuid), httplib.INTERNAL_SERVER_ERROR, resp_headers
             else:
-                return out.format(traceback.format_exc()), 500, resp_headers
+                return out.format(traceback.format_exc()), httplib.INTERNAL_SERVER_ERROR, resp_headers
         finally:
             current_app.stats_client.timing(req_stat_name, get_duration_ms(req_start_dt))
 
         if response:
             current_app.stats_client.incr('success', 1)
             payload, status_code, headers = response
-            if 300 > status_code < 200:
+            if 200 < status_code < 300:
                 msg = {
                     'request_id': req_uuid,
-                    'message': str(payload),
                     'headers': str(headers),
                     'request_data': str(request.data),
                     'status_code': str(status_code)
                 }
-                self.log.error(json.dumps(msg))
+                self.log.error(str(payload), extra=msg)
                 payload = out.format(req_uuid) if not current_app.debug else payload
             return payload, status_code, dict(headers)
 
@@ -103,13 +102,12 @@ class Pipeline(object):
         current_app.stats_client.timing(req_stat_name, get_duration_ms(req_start_dt))
         msg = {
             'request_id': req_uuid,
-            'message': 'No response from handlers',
             'headers': str(request.headers),
             'request_data': str(request.data)
         }
-        self.log.error(json.dumps(msg))
+        self.log.error('No response from handlers', msg)
 
         if not current_app.debug:
-            return out.format(req_uuid), 500, resp_headers
+            return out.format(req_uuid), httplib.INTERNAL_SERVER_ERROR, resp_headers
         else:
-            return out.format('No response from handlers'), 500, resp_headers
+            return out.format('No response from handlers'), httplib.INTERNAL_SERVER_ERROR, resp_headers

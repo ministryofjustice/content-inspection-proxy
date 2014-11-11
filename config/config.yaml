@@ -69,7 +69,7 @@ routes:
 #log_file: /cip/cip/cip.log
 
 #flask options
-DEBUG: True
+DEBUG: False
 
 statsd:
   enabled: True

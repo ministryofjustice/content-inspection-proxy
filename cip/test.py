@@ -60,5 +60,12 @@ class CIPTestCase(unittest.TestCase):
         response = self.app.post('/soap', data=soap_bookVisit_expansion)
         self.assertEqual(response.status_code, 500)
 
+    def test_latency(self):
+        start = time.time()
+        self.app.get('/latency')
+        delta = (time.time() - start)
+        self.assertGreater(delta, 0.5)
+        self.assertLess(delta, 1)
+
 if __name__ == '__main__':
     unittest.main()

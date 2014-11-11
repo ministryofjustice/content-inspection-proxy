@@ -1,5 +1,5 @@
 import os
-import json
+import httplib
 import requests
 from urlparse import urlsplit
 
@@ -59,8 +59,8 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
         }
 
         url = self.url(path)
-        self.log.debug(json.dumps("Requesting {}: {}".format(
-            request.method.upper(), url)))
+        self.log.debug("Requesting {}: {}".format(
+            request.method.upper(), url))
         headers = self.sanitize_headers(request.headers)
         request_method = method_dict[request.method.lower()]
         response = request_method(url, request.data, headers=headers)
@@ -71,10 +71,10 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
 class RequestHandlerMock(RequestHandler):
     def get(self, request, path=None, next_handler=None):
         url = self.url(path)
-        self.log.debug(json.dumps("Mocking GET {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path), 200, {}
+        self.log.debug("Mocking GET {}".format(url))
+        return "requested:{}".format(urlsplit(url).path), httplib.OK, {}
 
     def post(self, request, path=None, next_handler=None):
         url = self.url(path)
-        self.log.debug(json.dumps("Mocking POST {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path), 200, {}
+        self.log.debug("Mocking POST {}".format(url))
+        return "requested:{}".format(urlsplit(url).path), httplib.OK, {}
