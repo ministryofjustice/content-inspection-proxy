@@ -73,7 +73,10 @@ for fixture in config['fixtures']:
         if DEBUG:
             print traceback.format_exc()
 
-    #ugly
+    # Temporarily extending existing dictionary with sleep.
+    # Otherwise we should have had to extend DSL to with different token for sleep and different for request.
+    # ..and this convinces me that next DSL extension should force us to migrate to i.e. nosetests or cucumber.
+    # Anything but not our DSL.
     if 'sleep' in fixture.keys():
         time.sleep(fixture['sleep'])
     print

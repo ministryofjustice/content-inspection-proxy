@@ -6,6 +6,7 @@ A fully configurable and extensible proxy on top on your api
 
 Use cases
  * throttling
+ * latency simulation
  * content inspection
 
 

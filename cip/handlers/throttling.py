@@ -38,15 +38,18 @@ class ThrottlingHandler(BaseHandler):
         self.expiration_window = self.config.get('expiration_window', 0)
 
     def __call__(self, request, path=None, next_handler=None):
-        # let's calculate the end time of slot
-        reset = (int(time.time()) // self.per) * self.per + self.per
+        # let's calculate the end time of current slot
+        period_len = self.per
+        periods_count = int(time.time()) // period_len
+        period_start = periods_count * period_len
+        period_end = period_start + period_len
 
         # let's get redis key from slot end time
-        slot_key = "{}-{}".format(self.redis_key_prefix, reset)
+        slot_key = "{}-{}".format(self.redis_key_prefix, period_end)
 
         p = self.redis.pipeline()
         p.incr(slot_key)
-        p.expireat(slot_key, reset + self.expiration_window)
+        p.expireat(slot_key, period_end + self.expiration_window)
 
         # what is out current slot usage?
         slot_value = p.execute()[0]
