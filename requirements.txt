@@ -4,3 +4,6 @@ PyYAML
 flask
 gunicorn
 gevent
+redis
+statsd
+python-logstash

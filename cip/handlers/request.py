@@ -1,11 +1,12 @@
-import json
+import os
+import httplib
 import requests
 from urlparse import urlsplit
 
-from cip.handler import BaseHandler
+from cip.handler import BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandlerMixin
 
 
-class RequestHandler(BaseHandler):
+class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandlerMixin):
 
     EXCLUDE_HEADERS = [
         # Certain response headers should NOT be just tunneled through.
@@ -30,6 +31,12 @@ class RequestHandler(BaseHandler):
         'host',
     ]
 
+    def __init__(self, **kwargs):
+        super(RequestHandler, self).__init__(**kwargs)
+        if 'CIP_REQ_URL' in os.environ:
+            self.config['url'] = os.environ['CIP_REQ_URL']
+            self.log.debug("updating request to use url: {}".format(self.config['url']))
+
     @classmethod
     def sanitize_headers(cls, headers):
         """
@@ -43,33 +50,31 @@ class RequestHandler(BaseHandler):
                 new_headers.pop(header, None)
         return new_headers
 
-    def base_method(self, request, path=None, method=None):
+    def base_request_methods(self, request, path=None, method=None, next_handler=None):
+        # let's make sure we haven't been misconfigured
         method_dict = {
             'get': requests.get,
             'post': requests.post,
             'head': requests.head
         }
 
-        if not method or method not in method_dict:
-            raise Exception('Invalid method')
-
         url = self.url(path)
-        self.log.debug(json.dumps("Requesting {}: {}".format(
-            self.req_method.upper(), url)))
+        self.log.debug("Requesting {}: {}".format(
+            request.method.upper(), url))
         headers = self.sanitize_headers(request.headers)
-        response = method_dict[self.req_method](url, request.data,
-                                                headers=headers)
+        request_method = method_dict[request.method.lower()]
+        response = request_method(url, request.data, headers=headers)
         response.headers = self.sanitize_headers(response.headers)
         return response.text, response.status_code, response.headers.items()
 
 
 class RequestHandlerMock(RequestHandler):
-    def get(self, request, path=None):
+    def get(self, request, path=None, next_handler=None):
         url = self.url(path)
-        self.log.debug(json.dumps("Mocking GET {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path), 200, {}
+        self.log.debug("Mocking GET {}".format(url))
+        return "requested:{}".format(urlsplit(url).path), httplib.OK, {}
 
-    def post(self, request, path=None):
+    def post(self, request, path=None, next_handler=None):
         url = self.url(path)
-        self.log.debug(json.dumps("Mocking POST {}".format(url)))
-        return "requested:{}".format(urlsplit(url).path), 200, {}
+        self.log.debug("Mocking POST {}".format(url))
+        return "requested:{}".format(urlsplit(url).path), httplib.OK, {}

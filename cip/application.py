@@ -1,17 +1,12 @@
 import json
 from logging import FileHandler
-from logging import Formatter
-import logging
-import os
 
 from flask import Flask
+import logstash
 
 from cip.config import open_config
 from cip.pipeline import Pipeline
-
-
-def blank_view():
-    pass
+from cip.stats import setup_stats_client
 
 
 def setup_routes(app):
@@ -24,7 +19,7 @@ def setup_routes(app):
 
     pipelines = {}
     for name in app.config.get('pipelines').keys():
-        pipelines[name] = Pipeline(app.config['pipelines'][name], app.logger)
+        pipelines[name] = Pipeline(app.config['pipelines'][name], pipeline_name=name, logger=app.logger)
 
     index = 0
     for route, route_config in app.config.get('routes').iteritems():
@@ -51,7 +46,7 @@ def setup_routes(app):
                              strict_slashes=False,
                              methods=pipelines[pipeline_name].methods)
 
-        app.logger.debug(json.dumps("Added route: {}".format(route)))
+        app.logger.debug("Added route: {}".format(route))
         index += 1
         # Place dummy handler
     return app
@@ -59,24 +54,21 @@ def setup_routes(app):
 
 def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
-    @app.route('/dummy', methods=['POST'])
-    def dummy():
-        return '<success>Bingo</success>'
-
-    if 'CIP_HIDE_ERRORS' in os.environ:
-        app.config['hide_errors'] = True
-
-    log_fmt = '{"timestamp":"%(asctime)s", "level": "%(levelname)s",' + \
-              '"module": "%(module)s", "location": "%(pathname)s:%(lineno)d]",' + \
-              '"payload": %(message)s}'
 
     open_config(app, config_file=config_file)
+    setup_stats_client(app)
+
     if 'log_file' in app.config:
-        fh = FileHandler(app.config['log_file'])
-        fh.setFormatter(Formatter(log_fmt))
-        app.logger.addHandler(fh)
-    else:
-        app.debug_log_format = log_fmt
+        file_handler = FileHandler(app.config['log_file'])
+        file_handler.setFormatter(logstash.LogstashFormatterVersion1)
+        app.logger.addHandler(file_handler)
+
+    logstash_config = app.config.get('logstash', {})
+    if logstash_config.get('enabled', False):
+        host = logstash_config.get('host', '127.0.0.1')
+        port = logstash_config.get('port', 5959)
+        version = logstash_config.get('version', 1)
+        app.logger.addHandler(logstash.LogstashHandler(host, port, version=version))
 
     setup_routes(app)
     return app
