@@ -122,7 +122,7 @@ routes:
     pipeline: test_latency
 
 #flask options
-DEBUG: False
+DEBUG: True
 
 #log_file: ../cip.log
 

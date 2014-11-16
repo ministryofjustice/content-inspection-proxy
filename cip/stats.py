@@ -1,28 +1,19 @@
+import functools
 import statsd
 import time
+import traceback
 
 
-class NullStatsdClient(object):
+class NullStatsClient(object):
     """
-    Minimalistic Null/Mock Statsd Client so that we can always call any stats_client method and
+    Minimalistic Null/Mock Statsd Client, so that we can always call any stats_client method and
     it will fail silently if not configured.
 
     We are not yet implementing pipelines/timers as not used at the moment.
     """
-    def timing(self, *args, **kwargs):
-        pass
 
-    def incr(self, *args, **kwargs):
-        pass
-
-    def decr(self, *args, **kwargs):
-        pass
-
-    def gauge(self, *args, **kwargs):
-        pass
-
-    def set(self, *args, **kwargs):
-        pass
+    def __getattr__(self, item):
+        return lambda *args, **kwargs: None
 
 
 def setup_stats_client(app):
@@ -33,13 +24,13 @@ def setup_stats_client(app):
     statsd_config = app.config.get('statsd', {})
     if statsd_config.get('enabled', False):
         host = statsd_config.get('host', '127.0.0.1')
-        port = statsd_config.get('host', 8125)
-        prefix = statsd_config.get('prefix', 8125)
+        port = statsd_config.get('port', 8125)
+        prefix = statsd_config.get('prefix', 'cip')
         client = statsd.StatsClient(host=host, port=port, prefix=prefix)
         app.stats_client = client
     else:
         app.logger.warn("statsd is not configured")
-        app.stats_client = NullStatsdClient()
+        app.stats_client = NullStatsClient()
     return app
 
 

@@ -29,7 +29,6 @@ class UpperKeyDict(OrderedDict):
 
 
 def open_config(app, config_file):
-    global config
     with app.open_resource(config_file) as f:
         # we are using our loader as flask checks for keys in uppercase
         config = yaml.load(f.read(), UpperKeyLoader)

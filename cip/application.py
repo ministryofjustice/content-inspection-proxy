@@ -54,6 +54,7 @@ def setup_routes(app):
 
 def app_maker(config_file="../config/config.yaml"):
     app = Flask(__name__)
+    print("Opening config: {}".format(config_file))
 
     open_config(app, config_file=config_file)
     setup_stats_client(app)
