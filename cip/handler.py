@@ -52,16 +52,6 @@ class BaseHandler(object):
         current_app.stats_client.timing(self.handler_name, get_duration_ms(req_start_dt))
         return response
 
-    def url(self, path=None):
-        baseurl = self.config['url']
-        if path:
-            if baseurl.endswith('/'):
-                return "{}{}".format(baseurl, path)
-            else:
-                return "{}/{}".format(baseurl, path)
-        else:
-            return baseurl
-
 
 class BaseHandlerMixin(object):
     def base_request_methods(self, request, path=None, method=None, next_handler=None):

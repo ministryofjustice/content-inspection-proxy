@@ -1,3 +1,12 @@
+"""
+Handler to recreate request on target host. Terminates the pipeline.
+
+example_config:
+    verify: True (default; can be also a path to CA_BUNDLE; overwritten by ENV variable CURL_CA_BUNDLE)
+    url: i.e. http://google.com/ (overwritten by ENV variable CIP_REQ_URL)
+    cert: None (default; specific cert or a list; see: http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification)
+
+"""
 import os
 import httplib
 import requests
@@ -36,6 +45,9 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
         if 'CIP_REQ_URL' in os.environ:
             self.config['url'] = os.environ['CIP_REQ_URL']
             self.log.debug("updating request to use url: {}".format(self.config['url']))
+        self.url = self.config['url']
+        self.verify = self.config.get('verify', True)
+        self.cert = self.config.get('cert', None)
 
     @classmethod
     def sanitize_headers(cls, headers):
@@ -51,21 +63,35 @@ class RequestHandler(BaseHandler, GetHandlerMixin, PostHandlerMixin, HeadHandler
         return new_headers
 
     def base_request_methods(self, request, path=None, method=None, next_handler=None):
-        # let's make sure we haven't been misconfigured
         method_dict = {
             'get': requests.get,
             'post': requests.post,
             'head': requests.head
         }
 
-        url = self.url(path)
+        url = self.geturl(path)
         self.log.debug("Requesting {}: {}".format(
             request.method.upper(), url))
         headers = self.sanitize_headers(request.headers)
         request_method = method_dict[request.method.lower()]
-        response = request_method(url, request.data, headers=headers)
+        response = request_method(url, request.data, verify=self.verify, cert=self.cert, headers=headers)
         response.headers = self.sanitize_headers(response.headers)
         return response.text, response.status_code, response.headers.items()
+
+    def geturl(self, path=None):
+        """
+        merges url and path trying to be smart about backslash
+        :param path: path from request
+        :return: merged url + path
+        """
+        baseurl = self.url
+        if path:
+            if baseurl.endswith('/'):
+                return "{}{}".format(baseurl, path)
+            else:
+                return "{}/{}".format(baseurl, path)
+        else:
+            return baseurl
 
 
 class RequestHandlerMock(RequestHandler):

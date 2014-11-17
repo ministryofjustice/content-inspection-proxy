@@ -18,6 +18,7 @@ pipelines:
         service_url: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
       - handler: cip.handlers.request.RequestHandler
+        verify: True
         url: http://nomis.local/PrisonVisitBookingService/PrisonVisitBookingOperationsService
 
   direct:
