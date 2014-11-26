@@ -6,6 +6,13 @@ example_config:
     url: i.e. http://google.com/ (overwritten by ENV variable CIP_REQ_URL)
     cert: None (default; specific cert or a list; see: http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification)
 
+example_config_with_client_cert:
+    verify: False (let's not verify remote cert)
+    url: https://foo.bar/baz
+    cert:
+      - /path/client.crt
+      - /path/client.key
+
 """
 import os
 import httplib
